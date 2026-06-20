@@ -15,13 +15,13 @@ function renderAt(path: string) {
 describe("App router", () => {
   it("renders the landing page at /", () => {
     renderAt("/");
+    // The landing hero shows the parody tagline as the page's h1.
     expect(
-      screen.getByRole("heading", { name: "Slop Simulator" }),
+      screen.getByRole("heading", {
+        level: 1,
+        name: /fully autonomous slop engine/i,
+      }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Open the demo" })).toHaveAttribute(
-      "href",
-      "/demo",
-    );
   });
 
   it("renders the demo app shell at /demo", () => {
@@ -37,10 +37,12 @@ describe("App router", () => {
     expect(screen.getByRole("heading", { name: "404" })).toBeInTheDocument();
   });
 
-  it("navigates from landing to demo via the link", async () => {
+  it("navigates from landing to demo via the nav Demo button", async () => {
     const user = userEvent.setup();
     renderAt("/");
-    await user.click(screen.getByRole("link", { name: "Open the demo" }));
+    // The landing nav exposes a Demo link/button that routes client-side to
+    // /demo, which now mounts the Jira-parody shell (its Board heading).
+    await user.click(screen.getAllByRole("link", { name: "Demo" })[0]);
     expect(screen.getByRole("heading", { name: "Board" })).toBeInTheDocument();
   });
 
@@ -49,7 +51,10 @@ describe("App router", () => {
     renderAt("/nowhere");
     await user.click(screen.getByRole("link", { name: "Back to home" }));
     expect(
-      screen.getByRole("heading", { name: "Slop Simulator" }),
+      screen.getByRole("heading", {
+        level: 1,
+        name: /fully autonomous slop engine/i,
+      }),
     ).toBeInTheDocument();
   });
 });

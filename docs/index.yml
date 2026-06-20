@@ -39,7 +39,7 @@ changes:
     path: changes/0003-landing-page.md
     description: Full parody marketing page at / with all sections, copy, animations, and Demo CTA.
     spec: landing-page
-    status: draft
+    status: complete
     depends_on: ["0002"]
   - id: "0004"
     name: demo-app-shell

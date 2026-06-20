@@ -1,13 +1,4 @@
-import { Link } from "react-router-dom";
-
-// Placeholder landing page for the scaffold. Replaced by the full parody
-// marketing page in change 0003.
-export function LandingPage() {
-  return (
-    <main>
-      <h1>Slop Simulator</h1>
-      <p>The world&apos;s first fully autonomous slop engine.</p>
-      <Link to="/demo">Open the demo</Link>
-    </main>
-  );
-}
+// The `/` route renders the full parody marketing page implemented under
+// features/landing. This module is the thin route entry; the page itself lives
+// in the feature so it stays self-contained and testable.
+export { LandingPage } from "../features/landing/LandingPage.tsx";
