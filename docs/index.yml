@@ -1,0 +1,71 @@
+# Documentation Index
+# Auto-updated by /spec-writer and /project-management skills
+
+specs:
+  - name: architecture
+    path: specs/architecture/
+    description: Single Go server serving a Bun/Vite/React SPA with end-to-end HMR, 100% coverage, and CI.
+    status: active
+  - name: demo-jira-clone
+    path: specs/demo-jira-clone/
+    description: In-browser parody of Jira at /demo with exaggerated agentic-AI features and a simulated streaming agent.
+    status: active
+  - name: design-system
+    path: specs/design-system/
+    description: shadcn/ui + Tailwind + Motion foundation with scoped marketing (dark) and Jira (light) themes.
+    status: active
+  - name: landing-page
+    path: specs/landing-page/
+    description: Parody AI-SaaS marketing landing page at / with a prominent Demo CTA.
+    status: active
+
+changes:
+  - id: "0001"
+    name: project-scaffold
+    path: changes/0001-project-scaffold.md
+    description: Go server + Bun/Vite/React SPA + end-to-end HMR + embedded prod serving + CI with 100% coverage gate.
+    spec: architecture
+    status: draft
+    depends_on: []
+  - id: "0002"
+    name: design-system-foundation
+    path: changes/0002-design-system-foundation.md
+    description: Tailwind + shadcn/ui + Motion primitives + scoped dual themes with reduced-motion handling.
+    spec: design-system
+    status: draft
+    depends_on: ["0001"]
+  - id: "0003"
+    name: landing-page
+    path: changes/0003-landing-page.md
+    description: Full parody marketing page at / with all sections, copy, animations, and Demo CTA.
+    spec: landing-page
+    status: draft
+    depends_on: ["0002"]
+  - id: "0004"
+    name: demo-app-shell
+    path: changes/0004-demo-app-shell.md
+    description: Jira-look chrome, demo routing, Zustand store, and seeded mock dataset.
+    spec: demo-jira-clone
+    status: draft
+    depends_on: ["0002"]
+  - id: "0005"
+    name: demo-board
+    path: changes/0005-demo-board.md
+    description: Kanban board with columns, detailed issue cards, and drag-to-transition.
+    spec: demo-jira-clone
+    status: draft
+    depends_on: ["0004"]
+  - id: "0006"
+    name: demo-issue-detail
+    path: changes/0006-demo-issue-detail.md
+    description: Two-column issue detail view with status transitions and comment activity feed.
+    spec: demo-jira-clone
+    status: draft
+    depends_on: ["0005"]
+  - id: "0007"
+    name: demo-agent-features
+    path: changes/0007-demo-agent-features.md
+    description: Simulated streaming agent, Agentic Autopilot, Ask Rovo, AI-generate fields, and agent roster.
+    spec: demo-jira-clone
+    status: draft
+    depends_on: ["0005", "0006"]
