@@ -105,12 +105,16 @@ export function Terminal({
       <pre className="m-0 min-h-[9.5rem] whitespace-pre-wrap break-words p-4 leading-relaxed text-foreground">
         {/* Lines are an append-only, ordered list (a line is never reordered or
             removed once typed), so the index is a stable key even if two scripted
-            lines happen to share text. */}
+            lines happen to share text. Rendered as block-level <span>s because
+            <pre> only permits phrasing content — a <div> child would be invalid
+            HTML. */}
         {completed.map((line, i) => (
-          <div key={i}>{line}</div>
+          <span key={i} className="block">
+            {line}
+          </span>
         ))}
         {inProgress !== null && (
-          <div>
+          <span className="block">
             {inProgress}
             <span
               className={cn(
@@ -118,7 +122,7 @@ export function Terminal({
                 !reduced && "animate-pulse",
               )}
             />
-          </div>
+          </span>
         )}
         {done && (
           <span

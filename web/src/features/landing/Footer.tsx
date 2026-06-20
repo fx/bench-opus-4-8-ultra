@@ -25,13 +25,13 @@ export function Footer() {
             </p>
             <div className="mt-5 flex gap-3">
               {FOOTER_SOCIALS.map((social) => (
-                <a
+                <Link
                   key={social}
-                  href="/demo"
+                  to="/demo"
                   className="text-xs text-muted-foreground transition-colors hover:text-foreground"
                 >
                   {social}
-                </a>
+                </Link>
               ))}
             </div>
           </div>
@@ -44,12 +44,12 @@ export function Footer() {
               <ul className="mt-4 space-y-2.5">
                 {column.links.map((link) => (
                   <li key={link}>
-                    <a
-                      href="/demo"
+                    <Link
+                      to="/demo"
                       className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                     >
                       {link}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>
