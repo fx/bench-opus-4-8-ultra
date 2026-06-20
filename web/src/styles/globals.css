@@ -30,3 +30,25 @@
     outline-offset: 2px;
   }
 }
+
+/* Global reduced-motion guard. The JS `useReducedMotionSafe` hook only gates
+ * Motion's JS-driven animations; CSS animations/transitions (e.g. the dialog's
+ * tailwindcss-animate fade/zoom enter/exit, and any future 0007 agent/autopilot
+ * CSS motion) are NOT covered by it. This belt-and-suspenders rule collapses
+ * every CSS animation/transition to ~instant under `prefers-reduced-motion:
+ * reduce`, so the whole app honors the OS setting without per-component opt-in.
+ * Kept OUTSIDE @layer so it always wins the cascade over component utilities.
+ * !important is required to override per-element animation/transition durations
+ * set by utility classes. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

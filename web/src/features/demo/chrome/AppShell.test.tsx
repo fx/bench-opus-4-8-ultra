@@ -80,4 +80,25 @@ describe("AppShell", () => {
     expect(screen.queryByTestId("issue-detail")).not.toBeInTheDocument();
     expect(useDemoStore.getState().selectedIssueKey).toBeNull();
   });
+
+  it("restores focus to the originating card after the modal closes", async () => {
+    const user = userEvent.setup();
+    renderShell();
+
+    // Find the focusable card element (the role=button div, not the inner text).
+    const card = screen
+      .getByText("Generate infinite AI slop with one click")
+      .closest('[data-testid="board-card"]') as HTMLElement;
+
+    await user.click(card);
+    expect(screen.getByTestId("issue-detail")).toBeInTheDocument();
+
+    // Close via the built-in dialog close button.
+    await user.click(screen.getByRole("button", { name: "Close" }));
+    expect(screen.queryByTestId("issue-detail")).not.toBeInTheDocument();
+
+    // Focus is returned to the card that opened the modal (not <body>), so the
+    // keyboard a11y loop is intact.
+    expect(document.activeElement).toBe(card);
+  });
 });

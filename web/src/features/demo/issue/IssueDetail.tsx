@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { ReactNode } from "react";
 import {
   Dialog,
@@ -150,6 +150,34 @@ export function IssueDetail({
   // onEscapeKeyDown can. The DescriptionField publishes its state up.
   const [editingDescription, setEditingDescription] = useState(false);
 
+  // Remember which issue key was open so focus can be restored to ITS board card
+  // on close. We can't lean on Radix's built-in focus-return: the dialog content
+  // is conditionally rendered off `issue`, so closing unmounts it (the store
+  // clears the key) before Radix runs its restore — and the board Card is a
+  // role=button div that a mouse click doesn't natively focus anyway. The ref
+  // survives that unmount; onCloseAutoFocus uses it to focus the card explicitly.
+  // onCloseAutoFocus only fires after the dialog was open (issue was truthy), so
+  // the ref is always set by the time it runs — initialised to "" purely to
+  // satisfy the type (an empty key never matches a card).
+  const lastKeyRef = useRef<string>("");
+  if (issue) {
+    lastKeyRef.current = issue.key;
+  }
+
+  // On close, return focus to the card that opened the modal (found by its
+  // data-issue-key). preventDefault stops Radix's own (here ineffective) restore.
+  // If the card isn't in the DOM (e.g. detail rendered without a board), Radix's
+  // default focus handling stands.
+  function handleCloseAutoFocus(event: Event) {
+    const card = document.querySelector<HTMLElement>(
+      `[data-issue-key="${lastKeyRef.current}"]`,
+    );
+    if (card) {
+      event.preventDefault();
+      card.focus();
+    }
+  }
+
   // Radix Dialog is controlled off whether an issue is selected. onOpenChange
   // fires with false on overlay click, Escape, or the close button — all route
   // through closeIssue so the single store flag is the source of truth. Reset the
@@ -176,6 +204,7 @@ export function IssueDetail({
               event.preventDefault();
             }
           }}
+          onCloseAutoFocus={handleCloseAutoFocus}
         >
           {/* DialogContent renders its own accessible, visibly-focusable close
               button (top-right X with an sr-only "Close" label), which fires
