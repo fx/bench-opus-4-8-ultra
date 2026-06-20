@@ -24,9 +24,12 @@ describe("App router", () => {
     );
   });
 
-  it("renders the demo page at /demo", () => {
+  it("renders the demo app shell at /demo", () => {
     renderAt("/demo");
-    expect(screen.getByRole("heading", { name: "Demo" })).toBeInTheDocument();
+    // The demo route now mounts the Jira-parody shell: its Board heading and the
+    // SLOP project context stand in for the old placeholder page.
+    expect(screen.getByRole("heading", { name: "Board" })).toBeInTheDocument();
+    expect(screen.getByText("Slop Simulator")).toBeInTheDocument();
   });
 
   it("renders the not-found page for unknown routes", () => {
@@ -38,16 +41,7 @@ describe("App router", () => {
     const user = userEvent.setup();
     renderAt("/");
     await user.click(screen.getByRole("link", { name: "Open the demo" }));
-    expect(screen.getByRole("heading", { name: "Demo" })).toBeInTheDocument();
-  });
-
-  it("navigates from demo back to home", async () => {
-    const user = userEvent.setup();
-    renderAt("/demo");
-    await user.click(screen.getByRole("link", { name: "Back to home" }));
-    expect(
-      screen.getByRole("heading", { name: "Slop Simulator" }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Board" })).toBeInTheDocument();
   });
 
   it("navigates from not-found back to home", async () => {

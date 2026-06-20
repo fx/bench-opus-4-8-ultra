@@ -46,7 +46,7 @@ changes:
     path: changes/0004-demo-app-shell.md
     description: Jira-look chrome, demo routing, Zustand store, and seeded mock dataset.
     spec: demo-jira-clone
-    status: draft
+    status: complete
     depends_on: ["0002"]
   - id: "0005"
     name: demo-board
