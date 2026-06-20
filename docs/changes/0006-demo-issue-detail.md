@@ -5,7 +5,7 @@
 Implement the issue detail view opened from a board card: a two-column Jira-style layout (left content: summary, status dropdown, description, activity/comments; right Details panel) with status transitions that reflect on the board and a working (mock) comment composer.
 
 **Spec:** [Demo Jira Clone](../specs/demo-jira-clone/)
-**Status:** draft
+**Status:** complete
 **Depends On:** 0005
 
 ## Motivation
@@ -80,10 +80,10 @@ The activity feed MUST list comments reverse-chronologically with avatar + times
 
 ## Tasks
 
-- [ ] Issue detail shell — `IssueDetail` modal + layout, open/close wiring from card, `DetailsPanel`; tests (open from card, fields shown)
-- [ ] Status + description — `StatusDropdown` transitions (sync board), editable description; tests (transition reflects on board)
-- [ ] Activity + comments — `ActivityFeed` + `CommentComposer`, `addComment`, time formatting util; tests (add comment, ordering, time format)
-- [ ] Update `README.md` to note the issue detail view
+- [x] Issue detail shell — `IssueDetail` modal + layout, open/close wiring from card, `DetailsPanel`; tests (open from card, fields shown)
+- [x] Status + description — `StatusDropdown` transitions (sync board), editable description; tests (transition reflects on board)
+- [x] Activity + comments — `ActivityFeed` + `CommentComposer`, `addComment`, time formatting util; tests (add comment, ordering, time format)
+- [x] Update `README.md` to note the issue detail view
 
 ## Open Questions
 

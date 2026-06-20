@@ -1,3 +1,4 @@
+import { useCallback, useRef } from "react";
 import type { KeyboardEvent, ReactNode } from "react";
 import { useDraggable } from "@dnd-kit/core";
 import { Sparkles } from "lucide-react";
@@ -40,6 +41,18 @@ export function Card({ issue, onOpen, aiSlot }: CardProps) {
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({ id: issue.key });
 
+  // The card's own DOM node. @dnd-kit's setNodeRef is a callback ref, so we
+  // compose it with a local ref (mergeRef below) to also hold the element — we
+  // need it to move focus onto the card before opening the detail modal.
+  const cardRef = useRef<HTMLDivElement | null>(null);
+  const mergeRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      cardRef.current = node;
+      setNodeRef(node);
+    },
+    [setNodeRef],
+  );
+
   // While dragging, translate the card under the pointer and fade it (opacity is
   // applied via the dragging className below) so it reads as the moving item.
   const style = transform
@@ -49,6 +62,12 @@ export function Card({ issue, onOpen, aiSlot }: CardProps) {
   const interactive = Boolean(onOpen);
 
   function handleOpen() {
+    // Move focus onto the card BEFORE opening so it becomes the focus anchor the
+    // dialog returns focus to on close. A mouse click on this div (role=button)
+    // does not focus it natively, so without this the dialog would restore focus
+    // to <body> and the keyboard a11y loop would break. On Enter the card is
+    // already focused, so this is a harmless no-op.
+    cardRef.current?.focus();
     onOpen?.(issue.key);
   }
 
@@ -71,7 +90,7 @@ export function Card({ issue, onOpen, aiSlot }: CardProps) {
 
   return (
     <div
-      ref={setNodeRef}
+      ref={mergeRef}
       style={style}
       // @dnd-kit's attributes (role=button, tabIndex, aria-roledescription for
       // the keyboard drag sensor) come first; the card's own handlers and data

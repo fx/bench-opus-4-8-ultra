@@ -115,6 +115,18 @@ describe("Card interactivity", () => {
     expect(onOpen).toHaveBeenCalledWith("SLOP-101");
   });
 
+  it("focuses the card when opened (so the dialog can restore focus to it)", () => {
+    // A mouse click on the role=button div does not focus it natively, so the
+    // handler focuses the card explicitly — making it the anchor the modal
+    // returns focus to on close.
+    const onOpen = vi.fn();
+    renderCard(<Card issue={makeIssue()} onOpen={onOpen} />);
+    const card = screen.getByTestId("board-card");
+    expect(card).not.toHaveFocus();
+    fireEvent.click(card);
+    expect(card).toHaveFocus();
+  });
+
   it("calls onOpen on Enter when interactive", () => {
     const onOpen = vi.fn();
     renderCard(<Card issue={makeIssue()} onOpen={onOpen} />);

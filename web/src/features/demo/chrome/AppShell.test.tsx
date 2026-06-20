@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { AppShell } from "./AppShell.tsx";
 import { useDemoStore } from "../store/store.ts";
@@ -57,5 +58,47 @@ describe("AppShell", () => {
     const root = container.querySelector('[data-theme="jira"]');
     expect(root).toHaveClass("overflow-x-hidden");
     expect(root).toHaveClass("w-full");
+  });
+
+  it("opens the issue detail when a board card is clicked, and closes back to the board", async () => {
+    const user = userEvent.setup();
+    renderShell();
+
+    // The detail modal is not mounted until a card is clicked.
+    expect(screen.queryByTestId("issue-detail")).not.toBeInTheDocument();
+
+    const card = screen.getByText("Generate infinite AI slop with one click");
+    await user.click(card);
+
+    // Detail opens for the clicked card and the store records the selection.
+    const modal = screen.getByTestId("issue-detail");
+    expect(within(modal).getByText("SLOP-101")).toBeInTheDocument();
+    expect(useDemoStore.getState().selectedIssueKey).toBe("SLOP-101");
+
+    // Escape returns to the board (selection cleared, modal unmounted).
+    await user.keyboard("{Escape}");
+    expect(screen.queryByTestId("issue-detail")).not.toBeInTheDocument();
+    expect(useDemoStore.getState().selectedIssueKey).toBeNull();
+  });
+
+  it("restores focus to the originating card after the modal closes", async () => {
+    const user = userEvent.setup();
+    renderShell();
+
+    // Find the focusable card element (the role=button div, not the inner text).
+    const card = screen
+      .getByText("Generate infinite AI slop with one click")
+      .closest('[data-testid="board-card"]') as HTMLElement;
+
+    await user.click(card);
+    expect(screen.getByTestId("issue-detail")).toBeInTheDocument();
+
+    // Close via the built-in dialog close button.
+    await user.click(screen.getByRole("button", { name: "Close" }));
+    expect(screen.queryByTestId("issue-detail")).not.toBeInTheDocument();
+
+    // Focus is returned to the card that opened the modal (not <body>), so the
+    // keyboard a11y loop is intact.
+    expect(document.activeElement).toBe(card);
   });
 });

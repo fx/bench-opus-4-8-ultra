@@ -40,7 +40,11 @@ export const DialogContent = React.forwardRef<
         {...props}
       >
         {children}
-        <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring">
+        {/* The close control keeps a compact 16px X glyph but a comfortable
+            ~28px hit area (flex-centered h-7 w-7) so it clears the ~24px minimum
+            tap target on touch/mobile without enlarging the icon or disturbing
+            the layout (it sits inside the content's padding). */}
+        <DialogPrimitive.Close className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring">
           <X className="h-4 w-4" />
           <span className="sr-only">Close</span>
         </DialogPrimitive.Close>

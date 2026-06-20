@@ -10,14 +10,17 @@
 Everything is fictional parody — but every interaction is built to feel completely real: real timing, real streaming output, real-looking UI.
 
 > **Status:** Scaffold + design system landed, the **landing page (`/`) ships in
-> full**, and the **demo app shell plus its Kanban board (`/demo`) are in
-> place**. A single Go server serves a Bun/Vite/React SPA with end-to-end hot
-> reload in dev and embedded assets in prod, behind a 100%-coverage CI gate. The
-> `/demo` route now renders the Jira-look-alike shell (chrome, store, seed) with
-> a working **drag-and-drop Kanban board** (see *What exists now*); the remaining
-> demo features (issue detail, agents) are still **planned**. See [`docs/`](docs/)
-> for the living specifications and change documents that drive implementation. As
-> features ship, this README is updated to describe what actually exists.
+> full**, and the **demo app shell, its Kanban board, and the issue detail view
+> (`/demo`) are in place**. A single Go server serves a Bun/Vite/React SPA with
+> end-to-end hot reload in dev and embedded assets in prod, behind a
+> 100%-coverage CI gate. The `/demo` route now renders the Jira-look-alike shell
+> (chrome, store, seed) with a working **drag-and-drop Kanban board** and a
+> **two-column issue detail view** (status transitions, editable description,
+> activity feed + comments) opened by clicking a card (see *What exists now*); the
+> remaining demo features (the streaming agent, Autopilot, Ask Rovo, roster) are
+> still **planned**. See [`docs/`](docs/) for the living specifications and change
+> documents that drive implementation. As features ship, this README is updated to
+> describe what actually exists.
 
 ---
 
@@ -74,8 +77,8 @@ Everything is fictional parody — but every interaction is built to feel comple
   `lg`). Demo state lives in a client-side **Zustand store** seeded from a
   deterministic mock dataset (the `SLOP` project, parody users including the
   "Rovo Ultra" agent, and 14 parody issues across all four columns), with
-  selectors and a `reset()` that restores the seed exactly. Issue detail and
-  agent features are still **planned** (see below).
+  selectors and a `reset()` that restores the seed exactly. The agent features
+  are still **planned** (see below).
 
 - The **demo Kanban board** under
   [`web/src/features/demo/board`](web/src/features/demo/board): the main content
@@ -90,8 +93,28 @@ Everything is fictional parody — but every interaction is built to feel comple
   sensor** — and a drop dispatches a pure `moveIssue` store transition that
   updates the issue's status and both affected column counts. The transition
   logic lives in the store (unit-tested in isolation), separate from the dnd
-  wiring. Each card exposes slots for the later "Implement now with AI" action
-  (0007) and the issue-detail click (0006) without implementing them yet.
+  wiring. Clicking a card opens the **issue detail view** (below); each card also
+  exposes a slot for the later "Implement now with AI" action (0007) without
+  implementing it yet.
+
+- The **demo issue detail view** under
+  [`web/src/features/demo/issue`](web/src/features/demo/issue): clicking a board
+  card opens a Jira-style full-issue **modal** (built on the design-system
+  `Dialog`) with a two-column layout. The **left** column shows the issue key +
+  type, the summary, a coloured **status dropdown** (built on `DropdownMenu`), a
+  **click-to-edit inline description** (Save / Cancel, with Cmd/Ctrl+Enter to
+  save and Escape to cancel), and an **activity feed** with a working (mock)
+  **comment composer** — new comments are prepended so they appear at the top
+  with their author avatar and a relative timestamp. The **right** column is a
+  **Details panel** (assignee, reporter, priority, labels, story points, sprint,
+  epic, created/updated), rendering an explicit placeholder for every empty
+  field. Changing the status flows through the **same** pure store transition the
+  board's drag uses, so the board reflects the new column immediately (single
+  source of truth); closing the modal (Escape, overlay, or the close button)
+  returns to the board. Relative timestamps come from a small util with an
+  **injectable "now"** for deterministic tests, and the detail exposes slots for
+  the 0007 streaming-agent panel and AI-generate-field buttons without
+  implementing them yet.
 
 ## Development
 
@@ -124,10 +147,10 @@ bun run test:web    # Vitest + 100% coverage thresholds
 ### The demo (`/demo`)
 
 A convincing Jira look-alike whose every feature is a joke (the chrome shell —
-top nav, collapsible sidebar, store, and seed — and the **drag-and-drop Kanban
-board** already exist; see *What exists now*; the items below remain planned):
+top nav, collapsible sidebar, store, and seed — the **drag-and-drop Kanban
+board**, and the **issue detail view** already exist; see *What exists now*; the
+items below remain planned):
 
-- An **issue detail** view with status transitions, a details panel, and an activity feed
 - **"✨ Implement now with AI"** on every ticket — opens an agent panel that streams scripted, plausible implementation steps in real time and then "ships" the ticket
 - **Agentic Autopilot** — flip it on and watch tickets ship themselves
 - **Ask Rovo** — an AI command bar that answers any question with over-confident, citation-laden nonsense

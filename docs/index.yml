@@ -60,7 +60,7 @@ changes:
     path: changes/0006-demo-issue-detail.md
     description: Two-column issue detail view with status transitions and comment activity feed.
     spec: demo-jira-clone
-    status: draft
+    status: complete
     depends_on: ["0005"]
   - id: "0007"
     name: demo-agent-features
