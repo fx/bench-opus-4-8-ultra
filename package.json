@@ -1,0 +1,15 @@
+{
+  "name": "slop-simulator",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Parody AI-slop SaaS site + Jira-clone demo, served by a single Go server.",
+  "scripts": {
+    "dev": "PORT=${PORT:-8080} concurrently -n vite,go -c cyan,green \"bun run --cwd web dev\" \"air\"",
+    "build": "bun run --cwd web build",
+    "test:web": "bun run --cwd web coverage",
+    "test:go": "go test $(go list ./... | grep -v /node_modules/) -race -coverprofile=coverage.out -covermode=atomic && bash scripts/check-coverage.sh coverage.out"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

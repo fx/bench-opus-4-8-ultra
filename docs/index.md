@@ -13,7 +13,7 @@
 
 | # | Change | Spec | Status | Depends On |
 |---|--------|------|--------|------------|
-| 0001 | [Project Scaffold](changes/0001-project-scaffold.md) | [Architecture](specs/architecture/) | draft | — |
+| 0001 | [Project Scaffold](changes/0001-project-scaffold.md) | [Architecture](specs/architecture/) | complete | — |
 | 0002 | [Design System Foundation](changes/0002-design-system-foundation.md) | [Design System](specs/design-system/) | draft | 0001 |
 | 0003 | [Landing Page](changes/0003-landing-page.md) | [Landing Page](specs/landing-page/) | draft | 0002 |
 | 0004 | [Demo App Shell](changes/0004-demo-app-shell.md) | [Demo Jira Clone](specs/demo-jira-clone/) | draft | 0002 |

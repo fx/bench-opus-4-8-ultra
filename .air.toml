@@ -1,0 +1,27 @@
+# air config: live-rebuild the Go binary on .go changes only. Vite is run as a
+# separate, long-lived process (see the root `dev` script), so air never
+# touches the frontend — that keeps HMR state alive across Go restarts.
+root = "."
+tmp_dir = "tmp"
+
+[build]
+  # Build the server entrypoint to tmp/, then run it in dev mode. APP_ENV=dev
+  # turns on the Vite reverse proxy; PORT is inherited from the parent `dev`
+  # script so both Vite's HMR clientPort and the Go listener agree on one port.
+  cmd = "go build -o ./tmp/main ."
+  bin = "./tmp/main"
+  full_bin = "APP_ENV=dev ./tmp/main"
+  # Rebuild on Go sources only.
+  include_ext = ["go"]
+  # Never watch the frontend or build artifacts — Vite owns those.
+  exclude_dir = ["web", "tmp", "node_modules", "docs", ".github", "scripts"]
+  exclude_regex = ["_test\\.go"]
+  # On a Go save: interrupt the old process cleanly and don't relaunch a broken
+  # build, so a compile error surfaces instead of silently running stale code.
+  send_interrupt = true
+  stop_on_error = true
+  kill_delay = "500ms"
+  delay = 200
+
+[misc]
+  clean_on_exit = true

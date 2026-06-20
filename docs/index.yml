@@ -25,7 +25,7 @@ changes:
     path: changes/0001-project-scaffold.md
     description: Go server + Bun/Vite/React SPA + end-to-end HMR + embedded prod serving + CI with 100% coverage gate.
     spec: architecture
-    status: draft
+    status: complete
     depends_on: []
   - id: "0002"
     name: design-system-foundation
