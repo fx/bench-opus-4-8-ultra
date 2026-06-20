@@ -30,8 +30,16 @@ export function CommandBar() {
   const askRovo = useDemoStore((state) => state.askRovo);
   const clearRovoAnswer = useDemoStore((state) => state.clearRovoAnswer);
 
+  // The Ask button is disabled until there's a non-whitespace query, mirroring
+  // the comment composer's submit-gating. Trimmed so spaces-only doesn't enable
+  // it; the same guard short-circuits a submit (e.g. Enter) on an empty query.
+  const canAsk = query.trim() !== "";
+
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
+    if (!canAsk) {
+      return;
+    }
     askRovo(query);
   }
 
@@ -77,7 +85,12 @@ export function CommandBar() {
             onChange={(event) => setQuery(event.target.value)}
             autoFocus
           />
-          <Button type="submit" size="sm" data-testid="ask-rovo-submit">
+          <Button
+            type="submit"
+            size="sm"
+            disabled={!canAsk}
+            data-testid="ask-rovo-submit"
+          >
             Ask
           </Button>
         </form>

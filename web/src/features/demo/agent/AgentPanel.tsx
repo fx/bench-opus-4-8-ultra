@@ -9,7 +9,11 @@ import {
   stepViews,
   type AgentStepView,
 } from "./agent-engine.ts";
-import { AGENT_DONE_BANNER_BG, AGENT_DONE_COLOR } from "./agent-colors.ts";
+import {
+  AGENT_CANCEL_COLOR,
+  AGENT_DONE_BANNER_BG,
+  AGENT_DONE_COLOR,
+} from "./agent-colors.ts";
 
 // The simulated-agent panel (see docs/changes/0007 › Agent panel). It renders the
 // live run as a terminal-style log: an ordered list of steps, each transitioning
@@ -200,7 +204,12 @@ export function AgentPanel({ issue }: AgentPanelProps) {
             variant="ghost"
             onClick={cancelAgent}
             data-testid="agent-cancel"
-            className="gap-1.5 text-destructive hover:text-destructive"
+            // AA-safe destructive red as TEXT on the light panel / hover-accent —
+            // the theme `--destructive` token (white-on-red) fails here, so use
+            // the dedicated colour-on-light constant (agent-colors.ts). Inline
+            // style keeps the value the single guarded source of truth.
+            className="gap-1.5"
+            style={{ color: AGENT_CANCEL_COLOR }}
           >
             <X className="h-4 w-4" aria-hidden="true" />
             Cancel

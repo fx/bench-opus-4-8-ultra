@@ -1,8 +1,11 @@
 import { describe, it, expect } from "vitest";
 import {
+  AGENT_CANCEL_COLOR,
   AGENT_DONE_BANNER_BG,
   AGENT_DONE_COLOR,
+  AGENT_HOVER_ACCENT,
   AGENT_PANEL_BG,
+  AGENT_PANEL_SURFACE,
 } from "./agent-colors.ts";
 
 // WCAG AA contrast guard for the AgentPanel's hardcoded text-on-LIGHT colour
@@ -72,5 +75,23 @@ describe("AgentPanel done colour meets WCAG AA on its real background", () => {
     // The precomputed AGENT_DONE_BANNER_BG must equal compositing 10% green over
     // the panel — so the static hex can't silently drift from the intended tint.
     expect(banner).toEqual(composite(green, panel, 0.1));
+  });
+});
+
+describe("AgentPanel Cancel red meets WCAG AA on both light surfaces", () => {
+  // The Cancel button is a ghost button: its text sits on the panel surface
+  // (default) and on the hover-accent (:hover). The theme `--destructive` red is
+  // tuned for WHITE-on-red, NOT red-on-light, so the Cancel label uses the
+  // dedicated AGENT_CANCEL_COLOR. Both its rendered backgrounds are guarded here.
+  const red = hexToRgb(AGENT_CANCEL_COLOR);
+  const surface = hexToRgb(AGENT_PANEL_SURFACE);
+  const hover = hexToRgb(AGENT_HOVER_ACCENT);
+
+  it("clears AA on the panel surface (default state)", () => {
+    expect(contrast(red, surface)).toBeGreaterThanOrEqual(AA_NORMAL);
+  });
+
+  it("clears AA on the hover-accent surface (hover state)", () => {
+    expect(contrast(red, hover)).toBeGreaterThanOrEqual(AA_NORMAL);
   });
 });

@@ -23,3 +23,20 @@ export const AGENT_PANEL_BG = "#F4F5F7";
 // identically on every evergreen browser. The contrast guard verifies the green
 // text clears AA on exactly this background.
 export const AGENT_DONE_BANNER_BG = "#DEE7E6";
+
+// AGENT_CANCEL_COLOR is the destructive RED used as TEXT for the agent panel's
+// Cancel button (a ghost button). This is the INVERSE direction of the theme's
+// `--destructive` (#DA3016): that token is darkened+guarded for WHITE text ON red
+// (the notification badge), but here the red is TEXT on a LIGHT surface, which the
+// theme token does NOT satisfy — #DA3016 is only 4.44:1 on the panel and 4.27:1 on
+// the hover-accent, both FAILING AA for normal text. This darker red clears AA on
+// BOTH surfaces with margin. Guarded by agent-colors.contrast.test.ts.
+export const AGENT_CANCEL_COLOR = "#BD3015"; // red on light ≥ 5.2:1 (AA)
+
+// The two LIGHT surfaces the Cancel red sits on, as the live Jira theme resolves
+// them: the panel (`--panel`, the ghost button's transparent default → the panel
+// shows through) and the hover-accent (`--accent`, the ghost button's :hover
+// background). The contrast guard checks AGENT_CANCEL_COLOR against BOTH so the
+// Cancel label clears AA in its default AND hover states.
+export const AGENT_PANEL_SURFACE = "#F6F7F9";
+export const AGENT_HOVER_ACCENT = "#ECF3FF";

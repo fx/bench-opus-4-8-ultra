@@ -12,9 +12,9 @@ import { useDemoStore } from "../store/store.ts";
 // declarative and the start action has ONE implementation.
 //
 // CONTRAST: the button uses the design-system primary variant (white text on
-// `--primary` #0052CC, 6.82:1 in the Jira theme — already AA-guarded by the
-// theme contrast tests), so it introduces NO new hardcoded text-on-color. Focus
-// ring + disabled state come from the Button primitive.
+// the live `--primary` token #0058CC ≈ 6.43:1 in the Jira theme — already
+// AA-guarded by the theme contrast tests), so it introduces NO new hardcoded
+// text-on-color. Focus ring + disabled state come from the Button primitive.
 
 export interface ImplementWithAiButtonProps {
   issueKey: string;

@@ -27,12 +27,37 @@ describe("CommandBar", () => {
     expect(useDemoStore.getState().rovoAnswer).not.toBeNull();
   });
 
-  it("answers even a blank query (Rovo never has nothing)", () => {
+  it("disables the Ask button until the query is non-empty, re-enabling on input", () => {
     render(<CommandBar />);
     fireEvent.click(screen.getByRole("button", { name: "Ask Rovo" }));
     const dialog = screen.getByTestId("ask-rovo");
-    fireEvent.click(within(dialog).getByTestId("ask-rovo-submit"));
-    expect(screen.getByTestId("ask-rovo-answer")).toBeInTheDocument();
+    const input = within(dialog).getByTestId("ask-rovo-input");
+    const submit = within(dialog).getByTestId("ask-rovo-submit");
+
+    // Empty → disabled.
+    expect(submit).toBeDisabled();
+    // Whitespace-only → still disabled.
+    fireEvent.change(input, { target: { value: "   " } });
+    expect(submit).toBeDisabled();
+    // Real input → enabled.
+    fireEvent.change(input, { target: { value: "ship it?" } });
+    expect(submit).not.toBeDisabled();
+    // Clearing it back to empty → disabled again.
+    fireEvent.change(input, { target: { value: "" } });
+    expect(submit).toBeDisabled();
+  });
+
+  it("does not answer when an empty query is submitted (e.g. Enter)", () => {
+    render(<CommandBar />);
+    fireEvent.click(screen.getByRole("button", { name: "Ask Rovo" }));
+    const dialog = screen.getByTestId("ask-rovo");
+    // Submit the form directly with an empty query → guarded no-op, no answer.
+    const form = within(dialog)
+      .getByTestId("ask-rovo-input")
+      .closest("form") as HTMLFormElement;
+    fireEvent.submit(form);
+    expect(screen.queryByTestId("ask-rovo-answer")).not.toBeInTheDocument();
+    expect(useDemoStore.getState().rovoAnswer).toBeNull();
   });
 
   it("clears the answer and input when the dialog closes", () => {
