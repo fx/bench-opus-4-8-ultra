@@ -140,12 +140,17 @@ export function Card({ issue, onOpen, aiSlot }: CardProps) {
         </div>
       </div>
 
-      {/* AI action slot (0007). Revealed on hover/focus; empty until wired so it
-          adds no height when absent. */}
+      {/* AI action slot (0007). Hidden until the card is hovered or anything in
+          it receives focus. Uses `invisible` (visibility: hidden), NOT opacity:
+          opacity-0 would keep a focusable child (the 0007 button) in the tab
+          order while invisible, so keyboard users would tab to an unseen
+          control. `invisible` removes the slot and its descendants from the tab
+          order and from pointer hit-testing until revealed. It is absolutely
+          positioned, so the empty/hidden state adds no height (no layout shift). */}
       {aiSlot && (
         <div
           data-testid="card-ai-slot"
-          className="pointer-events-none absolute right-2 top-2 opacity-0 transition-opacity group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100"
+          className="invisible absolute right-2 top-2 group-hover:visible group-focus-within:visible"
         >
           {aiSlot}
         </div>

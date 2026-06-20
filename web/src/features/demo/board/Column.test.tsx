@@ -1,3 +1,4 @@
+import type { ReactElement } from "react";
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { DndContext } from "@dnd-kit/core";
@@ -28,7 +29,7 @@ function makeIssue(key: string, overrides: Partial<Issue> = {}): Issue {
   };
 }
 
-function renderColumn(ui: React.ReactElement) {
+function renderColumn(ui: ReactElement) {
   return render(<DndContext>{ui}</DndContext>);
 }
 

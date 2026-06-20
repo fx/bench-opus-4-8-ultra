@@ -1,3 +1,4 @@
+import type { ReactElement } from "react";
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
@@ -44,7 +45,7 @@ const issue: Issue = {
   updatedAt: 0,
 };
 
-function renderCard(ui: React.ReactElement) {
+function renderCard(ui: ReactElement) {
   return render(<DndContext>{ui}</DndContext>);
 }
 

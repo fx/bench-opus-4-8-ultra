@@ -1,3 +1,4 @@
+import type { ReactElement } from "react";
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { DndContext } from "@dnd-kit/core";
@@ -41,7 +42,7 @@ function makeIssue(overrides: Partial<Issue> = {}): Issue {
 }
 
 // Cards call useDraggable, which requires a DndContext ancestor.
-function renderCard(ui: React.ReactElement) {
+function renderCard(ui: ReactElement) {
   return render(<DndContext>{ui}</DndContext>);
 }
 
@@ -146,6 +147,25 @@ describe("Card AI slot", () => {
     );
     expect(screen.getByTestId("card-ai-slot")).toBeInTheDocument();
     expect(screen.getByText("Implement with AI")).toBeInTheDocument();
+  });
+
+  it("hides the AI slot by default and reveals it on the card's hover/focus-within", () => {
+    // The slot must use `invisible` (visibility: hidden) — which removes its
+    // focusable children from the tab order while hidden — NOT opacity-0, which
+    // would leave a hidden-but-tabbable control once 0007 puts a button here.
+    // jsdom can't resolve the group-hover/group-focus-within pseudo-states from
+    // the parent, so assert the wiring via the classes that drive the reveal.
+    renderCard(
+      <Card issue={makeIssue()} aiSlot={<button>Implement with AI</button>} />,
+    );
+    const slot = screen.getByTestId("card-ai-slot");
+    // Hidden (and untabbable) by default.
+    expect(slot).toHaveClass("invisible");
+    // Not revealed via opacity (the a11y trap we are avoiding).
+    expect(slot).not.toHaveClass("opacity-0");
+    // Revealed only on hover or when something inside the card is focused.
+    expect(slot).toHaveClass("group-hover:visible");
+    expect(slot).toHaveClass("group-focus-within:visible");
   });
 
   it("omits the AI slot container when not provided", () => {

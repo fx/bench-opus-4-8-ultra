@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { act, render, screen } from "@testing-library/react";
 import type { DragEndEvent } from "@dnd-kit/core";
@@ -22,7 +23,7 @@ vi.mock("@dnd-kit/core", async () => {
   return {
     ...actual,
     DndContext: (props: {
-      children: React.ReactNode;
+      children: ReactNode;
       onDragEnd?: (event: DragEndEvent) => void;
     }) => {
       capturedOnDragEnd = props.onDragEnd;
