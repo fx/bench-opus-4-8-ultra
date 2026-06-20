@@ -41,6 +41,15 @@ Everything is fictional parody — but every interaction is built to feel comple
 - **100% test coverage** for both Go and TypeScript, enforced by a coverage gate
   in **GitHub Actions CI** (build + tests + coverage + lint) that runs on every
   push and PR to `main`.
+- A **design-system foundation** under [`web/src`](web/src): Tailwind CSS +
+  shadcn/ui primitives (button, dialog, dropdown-menu, accordion, tooltip,
+  avatar, badge, switch, input, tabs, scroll-area) styled through CSS-variable
+  tokens, a `cn()` class-merge helper, self-hosted fonts (Geist, Geist/JetBrains
+  Mono, Inter — no CDN), two **scoped themes** (`data-theme="marketing"` dark
+  violet/Geist and `data-theme="jira"` light blue/Inter, applied via a
+  `ThemeScope` wrapper and isolated from each other), and centralized **Motion**
+  primitives (`FadeUp`, `Stagger`, `CountUp`, `Marquee`, shared easings) gated by
+  a single `useReducedMotionSafe` hook that honors `prefers-reduced-motion`.
 
 ## Development
 
@@ -96,11 +105,11 @@ All demo data is mocked in the browser; the "AI" is a deterministic, scripted si
 
 ---
 
-## Planned tech stack
+## Tech stack
 
 - **Bun** + **TypeScript** + **React**
-- **Motion** for animation
-- **shadcn/ui** (Tailwind CSS) for components
+- **Motion** for animation (centralized primitives shipped — see *What exists now*)
+- **shadcn/ui** (Tailwind CSS) for components (foundation shipped — see *What exists now*)
 - A single **Go** server serves the React SPA — embedded into the binary in production, and in development providing **full end-to-end hot reload** (Vite HMR for the frontend *and* Go auto-rebuild) through one port, in preparation for a real same-origin API
 - **100% test coverage** (Go + Vitest) enforced by **GitHub Actions CI** from the first commit
 

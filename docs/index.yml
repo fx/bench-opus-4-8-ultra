@@ -32,7 +32,7 @@ changes:
     path: changes/0002-design-system-foundation.md
     description: Tailwind + shadcn/ui + Motion primitives + scoped dual themes with reduced-motion handling.
     spec: design-system
-    status: draft
+    status: complete
     depends_on: ["0001"]
   - id: "0003"
     name: landing-page

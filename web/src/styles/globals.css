@@ -1,0 +1,32 @@
+/* All @import rules MUST precede other statements, so fonts and the scoped
+ * theme token sets are imported first; the @tailwind layers follow. */
+@import "./fonts.css";
+@import "./themes.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Shared, theme-agnostic baseline. Theme-specific tokens live in themes.css and
+ * are confined to their [data-theme] scope. */
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+  }
+
+  /* Visible focus in both themes (accessibility baseline). */
+  :focus-visible {
+    outline: 2px solid hsl(var(--primary));
+    outline-offset: 2px;
+  }
+}

@@ -5,7 +5,7 @@
 Establish the shared UI foundation: Tailwind CSS, shadcn/ui primitives, the font program, the two scoped themes (marketing dark + Jira light), and the centralized Motion animation primitives with global `prefers-reduced-motion` handling.
 
 **Spec:** [Design System](../specs/design-system/)
-**Status:** draft
+**Status:** complete
 **Depends On:** 0001
 
 ## Motivation
@@ -84,11 +84,11 @@ Centralized `FadeUp`, `Stagger`, `CountUp`, `Marquee`, and shared easings MUST e
 
 ## Tasks
 
-- [ ] Tailwind + shadcn setup — `tailwind.config.ts`, `components.json`, `cn()` util, global CSS, fonts; tests for `cn`
-- [ ] Theme tokens + `ThemeScope` — marketing & Jira CSS-variable token sets, `ThemeScope` component + tests (asserts `data-theme` applied)
-- [ ] Core shadcn primitives — add the listed primitives under `components/ui/` with render/interaction tests
-- [ ] Motion primitives — easings, `FadeUp`, `Stagger`, `CountUp`, `Marquee`, `useReducedMotionSafe`; tests incl. reduced-motion branches (fake timers for `CountUp`)
-- [ ] Update `README.md` design-system/tech section if architecture details changed
+- [x] Tailwind + shadcn setup — `tailwind.config.ts`, `components.json`, `cn()` util, global CSS, fonts; tests for `cn`
+- [x] Theme tokens + `ThemeScope` — marketing & Jira CSS-variable token sets, `ThemeScope` component + tests (asserts `data-theme` applied)
+- [x] Core shadcn primitives — add the listed primitives under `components/ui/` with render/interaction tests
+- [x] Motion primitives — easings, `FadeUp`, `Stagger`, `CountUp`, `Marquee`, `useReducedMotionSafe`; tests incl. reduced-motion branches (injectable clock for `CountUp`)
+- [x] Update `README.md` design-system/tech section if architecture details changed
 
 ## Open Questions
 
