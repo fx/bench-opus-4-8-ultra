@@ -74,11 +74,23 @@ const config = {
           from: { transform: "translateX(0)" },
           to: { transform: "translateX(-50%)" },
         },
+        // Slow, looping drift for the marketing hero aurora blobs. Purely
+        // ambient; gated off under reduced motion by the Backdrops component.
+        "aurora-drift": {
+          "0%, 100%": { transform: "translate3d(0, 0, 0) scale(1)" },
+          "50%": { transform: "translate3d(6%, 4%, 0) scale(1.15)" },
+        },
+        "aurora-drift-slow": {
+          "0%, 100%": { transform: "translate3d(0, 0, 0) scale(1.1)" },
+          "50%": { transform: "translate3d(-5%, -6%, 0) scale(0.95)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         marquee: "marquee var(--marquee-duration, 30s) linear infinite",
+        "aurora-drift": "aurora-drift 18s ease-in-out infinite",
+        "aurora-drift-slow": "aurora-drift-slow 24s ease-in-out infinite",
       },
     },
   },

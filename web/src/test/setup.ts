@@ -17,6 +17,26 @@ if (!("ResizeObserver" in globalThis)) {
     ResizeObserverStub as unknown as typeof ResizeObserver;
 }
 
+// jsdom also lacks IntersectionObserver, which Motion's whileInView/useInView
+// (used by the marketing motion primitives and section animations) relies on. A
+// no-op stub lets those render under tests; the reduced-motion/in-view branches
+// are asserted via injected hooks rather than real intersection events.
+if (!("IntersectionObserver" in globalThis)) {
+  class IntersectionObserverStub {
+    readonly root = null;
+    readonly rootMargin = "";
+    readonly thresholds: ReadonlyArray<number> = [];
+    observe(): void {}
+    unobserve(): void {}
+    disconnect(): void {}
+    takeRecords(): IntersectionObserverEntry[] {
+      return [];
+    }
+  }
+  globalThis.IntersectionObserver =
+    IntersectionObserverStub as unknown as typeof IntersectionObserver;
+}
+
 afterEach(() => {
   cleanup();
 });
