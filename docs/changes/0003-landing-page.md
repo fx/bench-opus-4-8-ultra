@@ -5,7 +5,7 @@
 Implement the full single-page parody marketing site at `/` for "Slop Simulator", with all eleven sections, ship-ready parody copy, Motion animations, responsive layout, and a prominent Demo CTA routing to `/demo`.
 
 **Spec:** [Landing Page](../specs/landing-page/)
-**Status:** draft
+**Status:** complete
 **Depends On:** 0002
 
 ## Motivation
@@ -88,16 +88,16 @@ Sections MUST animate on scroll; stats MUST count up; pricing toggle + FAQ MUST 
 
 ## Tasks
 
-- [ ] Landing shell + nav — route shell with `ThemeScope`, sticky glass nav with anchors + Demo CTA + mobile menu; tests (nav renders, Demo routes, mobile menu)
-- [ ] Hero + backdrops — hero with eyebrow/tagline/subhead/dual CTA + terminal typewriter mock; aurora/grain/grid; tests (content, CTA→/demo, reduced-motion)
-- [ ] Mid sections — LogoCloud (marquee), FeatureBento, HowItWorks (scroll-draw), Stats (count-up); content modules + tests
-- [ ] Conversion sections — Testimonials, Pricing (monthly/annual toggle), FAQ (accordion), BigCta (demo CTA), Footer; logic + tests (toggle math, accordion, CTA routing)
-- [ ] Update `README.md` landing-page description to reflect shipped content
+- [x] Landing shell + nav — route shell with `ThemeScope`, sticky glass nav with anchors + Demo CTA + mobile menu; tests (nav renders, Demo routes, mobile menu)
+- [x] Hero + backdrops — hero with eyebrow/tagline/subhead/dual CTA + terminal typewriter mock; aurora/grain/grid; tests (content, CTA→/demo, reduced-motion)
+- [x] Mid sections — LogoCloud (marquee), FeatureBento, HowItWorks (scroll-draw), Stats (count-up); content modules + tests
+- [x] Conversion sections — Testimonials, Pricing (monthly/annual toggle), FAQ (accordion), BigCta (demo CTA), Footer; logic + tests (toggle math, accordion, CTA routing)
+- [x] Update `README.md` landing-page description to reflect shipped content
 
 ## Open Questions
 
-- [ ] Exact mobile breakpoint for nav collapse — confirm during implementation.
-- [ ] Whether "Log in"/primary sign-up CTAs route to `/demo` or are inert — default: route to `/demo`.
+- [x] Exact mobile breakpoint for nav collapse — resolved: Tailwind `md` (768px); the nav collapses into the mobile menu below `md`.
+- [x] Whether "Log in"/primary sign-up CTAs route to `/demo` or are inert — resolved: all secondary CTAs ("Log in", footer links, socials) route to `/demo` per the default.
 
 ## References
 

@@ -9,13 +9,13 @@
 
 Everything is fictional parody — but every interaction is built to feel completely real: real timing, real streaming output, real-looking UI.
 
-> **Status:** Scaffold landed. The project skeleton — a single Go server that
-> serves a Bun/Vite/React SPA with end-to-end hot reload in dev and embedded
-> assets in prod, plus a 100%-coverage CI gate — now exists and runs. The
-> product **features** below (landing page, demo app) are still **planned**;
-> the routes currently render minimal placeholders. See [`docs/`](docs/) for the
-> living specifications and change documents that drive implementation. As
-> features ship, this README is updated to describe what actually exists.
+> **Status:** Scaffold + design system landed, and the **landing page (`/`) now
+> ships in full**. A single Go server serves a Bun/Vite/React SPA with
+> end-to-end hot reload in dev and embedded assets in prod, behind a
+> 100%-coverage CI gate. The **demo app (`/demo`) is still planned** and
+> currently renders a minimal placeholder. See [`docs/`](docs/) for the living
+> specifications and change documents that drive implementation. As features
+> ship, this README is updated to describe what actually exists.
 
 ---
 
@@ -50,6 +50,18 @@ Everything is fictional parody — but every interaction is built to feel comple
   `ThemeScope` wrapper and isolated from each other), and centralized **Motion**
   primitives (`FadeUp`, `Stagger`, `CountUp`, `Marquee`, shared easings) gated by
   a single `useReducedMotionSafe` hook that honors `prefers-reduced-motion`.
+- The **landing page** at `/` (under [`web/src/features/landing`](web/src/features/landing)) —
+  a single, polished parody of a top-tier AI-SaaS marketing site, scoped to the
+  marketing theme. It ships all eleven sections: a sticky glass nav (announcement
+  pill, in-page anchors, mobile menu) with a prominent **Demo** button that routes
+  to `/demo` client-side; a hero with an animated terminal-typewriter product
+  mock, parody tagline, and dual CTA; an aurora/grain/dot-grid backdrop; a logo-
+  cloud marquee; an asymmetric feature bento; a scroll-drawn "how it works"; a
+  count-up stats band; testimonials; a pricing table with a monthly/annual toggle;
+  an FAQ accordion; a big closing CTA; and a footer. All copy/data lives in a typed
+  `content.ts` module, every motion path respects `prefers-reduced-motion`, the
+  layout works from 320px up, and all assets (logos, avatars) are locally generated
+  SVG — no external/CDN calls.
 
 ## Development
 
@@ -78,16 +90,6 @@ bun run test:web    # Vitest + 100% coverage thresholds
 ---
 
 ## What's planned
-
-### Landing page (`/`)
-
-A single, polished scrolling page in the style of top-tier AI startup sites:
-
-- Sticky glass nav with a prominent **Demo** link to `/demo`
-- Hero with an animated product mock and parody tagline ("The world's first fully autonomous slop engine")
-- A bento grid of absurd "agentic" features (Agentic Slopflows, Hype Copilot, Autonomous Monetization Engine, Human-out-of-the-Loop Mode…)
-- "How it works" steps, an animated stats band (10× more slop per sprint, 0 developers required…), parody testimonials, pricing tiers (Hobby Slop → Pro Agentic → Enterprise Singularity), an FAQ, and a big closing call-to-action
-- Smooth scroll/entrance animations throughout, with full `prefers-reduced-motion` support
 
 ### The demo (`/demo`)
 

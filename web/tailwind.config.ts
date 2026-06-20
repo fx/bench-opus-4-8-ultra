@@ -24,6 +24,11 @@ const config = {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
           hover: "hsl(var(--primary-hover))",
+          // Lighter accent violet for text/icons ON dark surfaces (eyebrow
+          // labels, step numerals, avatar initials) so violet-on-dark clears
+          // WCAG AA, where the darker --primary (tuned for white-on-violet
+          // button backgrounds) would not. See styles/themes.css.
+          text: "hsl(var(--primary-text))",
         },
         slop: "hsl(var(--slop))",
         muted: {
@@ -74,11 +79,23 @@ const config = {
           from: { transform: "translateX(0)" },
           to: { transform: "translateX(-50%)" },
         },
+        // Slow, looping drift for the marketing hero aurora blobs. Purely
+        // ambient; gated off under reduced motion by the Backdrops component.
+        "aurora-drift": {
+          "0%, 100%": { transform: "translate3d(0, 0, 0) scale(1)" },
+          "50%": { transform: "translate3d(6%, 4%, 0) scale(1.15)" },
+        },
+        "aurora-drift-slow": {
+          "0%, 100%": { transform: "translate3d(0, 0, 0) scale(1.1)" },
+          "50%": { transform: "translate3d(-5%, -6%, 0) scale(0.95)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         marquee: "marquee var(--marquee-duration, 30s) linear infinite",
+        "aurora-drift": "aurora-drift 18s ease-in-out infinite",
+        "aurora-drift-slow": "aurora-drift-slow 24s ease-in-out infinite",
       },
     },
   },

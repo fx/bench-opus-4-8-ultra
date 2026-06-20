@@ -14,11 +14,23 @@
   --card: 0 0% 11%; /* #1C1C1C raised */
   --foreground: 0 0% 96%;
   --muted-foreground: 0 0% 64%;
-  --primary: 252 100% 68%; /* violet #7C5CFF */
+  /* Violet tuned for WCAG AA: white text on --primary must be ≥4.5:1 for normal
+     text. L68 (the old value) was only 4.35:1 and the old hover LIGHTENED to
+     3.23:1 — both failing. L64 = rgb(108,71,255) = 5.27:1 at rest, and the hover
+     DARKENS to L58 = rgb(84,41,255) = 6.69:1, so both states pass with margin. */
+  --primary: 252 100% 64%; /* violet #6C47FF — 5.27:1 on #fff */
   --primary-foreground: 0 0% 100%;
-  --primary-hover: 252 100% 74%;
+  --primary-hover: 252 100% 58%; /* darker on hover — 6.69:1 on #fff */
+  /* Accent violet used as TEXT on dark surfaces (eyebrow labels, step numerals,
+     avatar initials). This is the inverse contrast problem from --primary: it
+     needs violet-on-dark ≥4.5:1, so it must be LIGHTER, not darker. L74 =
+     rgb(149,122,255) measures 6.13:1 on the page bg (#0A0A0A) and 5.28:1 on the
+     harder card bg (#1C1C1C) — both clear AA with margin. Kept separate from
+     --primary so the button background can stay dark (white-on-violet) while
+     accent text stays light (violet-on-dark). */
+  --primary-text: 252 100% 74%; /* violet #957AFF — 5.28:1 on cards */
   --slop: 84 100% 62%; /* chartreuse #B6FF3C secondary */
-  --accent: 252 100% 68%;
+  --accent: 252 100% 64%;
   --accent-foreground: 0 0% 100%;
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
@@ -45,6 +57,9 @@
   --primary: 214 100% 40%; /* #0052CC Jira blue */
   --primary-foreground: 0 0% 100%;
   --primary-hover: 215 91% 34%; /* #0747A6 */
+  /* Light theme: accent text sits on white, so the dark blue --primary already
+     clears AA (#0052CC on #fff ≈ 7:1). The token mirrors --primary here. */
+  --primary-text: 214 100% 40%;
   --slop: 214 100% 40%;
   --accent: 214 100% 96%;
   --accent-foreground: 214 100% 40%;

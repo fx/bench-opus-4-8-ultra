@@ -6,17 +6,23 @@ import { cn } from "../../lib/cn.ts";
 // Button variants. Colors resolve to the active theme's tokens, so the same
 // primitive renders marketing (violet) or Jira (blue) styling by scope.
 export const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  // `transition-[color,background-color,transform]` + `active:translate-y-px`
+  // gives every button a subtle pressed response on pointerdown (the button dips
+  // 1px); per-variant `active:` overrides darken the fill while held.
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-[color,background-color,transform] active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary-hover",
+        default:
+          "bg-primary text-primary-foreground hover:bg-primary-hover active:bg-primary-hover",
         destructive:
-          "bg-destructive text-destructive-foreground hover:opacity-90",
+          "bg-destructive text-destructive-foreground hover:opacity-90 active:opacity-80",
         outline:
-          "border bg-transparent hover:bg-accent hover:text-accent-foreground",
-        secondary: "bg-panel text-foreground hover:opacity-90",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
+          "border bg-transparent hover:bg-accent hover:text-accent-foreground active:bg-accent/80",
+        secondary:
+          "bg-panel text-foreground hover:opacity-90 active:opacity-80",
+        ghost:
+          "hover:bg-accent hover:text-accent-foreground active:bg-accent/80",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
