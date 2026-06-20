@@ -9,13 +9,15 @@
 
 Everything is fictional parody — but every interaction is built to feel completely real: real timing, real streaming output, real-looking UI.
 
-> **Status:** Scaffold + design system landed, and the **landing page (`/`) now
-> ships in full**. A single Go server serves a Bun/Vite/React SPA with
-> end-to-end hot reload in dev and embedded assets in prod, behind a
-> 100%-coverage CI gate. The **demo app (`/demo`) is still planned** and
-> currently renders a minimal placeholder. See [`docs/`](docs/) for the living
-> specifications and change documents that drive implementation. As features
-> ship, this README is updated to describe what actually exists.
+> **Status:** Scaffold + design system landed, the **landing page (`/`) ships in
+> full**, and the **demo app shell (`/demo`) is in place**. A single Go server
+> serves a Bun/Vite/React SPA with end-to-end hot reload in dev and embedded
+> assets in prod, behind a 100%-coverage CI gate. The `/demo` route now renders
+> the Jira-look-alike shell (chrome, store, seed; see *What exists now*); the
+> remaining demo features (board, issue detail, agents) are still **planned**.
+> See [`docs/`](docs/) for the living specifications and change documents that
+> drive implementation. As features ship, this README is updated to describe
+> what actually exists.
 
 ---
 
@@ -62,6 +64,19 @@ Everything is fictional parody — but every interaction is built to feel comple
   `content.ts` module, every motion path respects `prefers-reduced-motion`, the
   layout works from 320px up, and all assets (logos, avatars) are locally generated
   SVG — no external/CDN calls.
+- The **demo app shell** under
+  [`web/src/features/demo`](web/src/features/demo): the `/demo` route now renders
+  a Jira-look-alike chrome — a fixed top nav (app-switcher, "Slop Jira" wordmark,
+  primary nav, blue **Create**, search, and an "Ask Rovo" AI entry point) and a
+  **collapsible** left sidebar (the `SLOP` project context plus the view list,
+  including **Board** and **Rovo Agents**), all scoped to `data-theme="jira"` and
+  responsive down to 320px (the sidebar auto-collapses to an icon rail below
+  `lg`). Demo state lives in a client-side **Zustand store** seeded from a
+  deterministic mock dataset (the `SLOP` project, parody users including the
+  "Rovo Ultra" agent, and 14 parody issues across all four columns), with
+  selectors and a `reset()` that restores the seed exactly. The main area shows a
+  placeholder board container; the real Kanban board, issue detail, and agent
+  features are still **planned** (see below).
 
 ## Development
 
@@ -93,9 +108,11 @@ bun run test:web    # Vitest + 100% coverage thresholds
 
 ### The demo (`/demo`)
 
-A convincing Jira look-alike whose every feature is a joke:
+A convincing Jira look-alike whose every feature is a joke (the chrome shell —
+top nav, collapsible sidebar, store, and seed — already exists; see *What exists
+now*; the items below remain planned):
 
-- Faithful Jira chrome — top nav, collapsible sidebar, and a **Kanban board** (To Do / In Progress / In Review / Done) with draggable, richly-detailed issue cards
+- A **Kanban board** (To Do / In Progress / In Review / Done) with draggable, richly-detailed issue cards in place of the current placeholder board container
 - An **issue detail** view with status transitions, a details panel, and an activity feed
 - **"✨ Implement now with AI"** on every ticket — opens an agent panel that streams scripted, plausible implementation steps in real time and then "ships" the ticket
 - **Agentic Autopilot** — flip it on and watch tickets ship themselves

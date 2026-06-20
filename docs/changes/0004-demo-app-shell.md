@@ -5,7 +5,7 @@
 Build the `/demo` application shell: the Jira-look-alike chrome (top nav, collapsible left sidebar, main content area), the demo route tree, the client-side state store, and the seeded mock dataset that later demo changes build on.
 
 **Spec:** [Demo Jira Clone](../specs/demo-jira-clone/)
-**Status:** draft
+**Status:** complete
 **Depends On:** 0002
 
 ## Motivation
@@ -82,10 +82,10 @@ The demo MUST hold all state client-side from a deterministic seed and SHOULD ex
 
 ## Tasks
 
-- [ ] Demo route shell + chrome — `AppShell`, `TopNav`, `Sidebar` (collapsible) with Jira theme; tests (render, collapse, nav items present)
-- [ ] Data layer — types + seed dataset (≥12 issues, users incl. agent, SLOP project); tests (seed shape/determinism)
-- [ ] State store — Zustand store with base state, selectors, `reset()`; tests for store actions/reset
-- [ ] Update `README.md` to note the `/demo` app shell
+- [x] Demo route shell + chrome — `AppShell`, `TopNav`, `Sidebar` (collapsible) with Jira theme; tests (render, collapse, nav items present)
+- [x] Data layer — types + seed dataset (≥12 issues, users incl. agent, SLOP project); tests (seed shape/determinism)
+- [x] State store — Zustand store with base state, selectors, `reset()`; tests for store actions/reset
+- [x] Update `README.md` to note the `/demo` app shell
 
 ## Open Questions
 

@@ -53,7 +53,9 @@
   --panel: 220 23% 97%;
   --card: 0 0% 100%;
   --foreground: 218 54% 20%; /* #172B4D text */
-  --muted-foreground: 215 16% 47%; /* #6B778C subtle */
+  /* #607085 — darkened from #6B778C so subtle text clears WCAG AA (4.5:1) on
+     the #F4F5F7 page bg (4.72:1) and on white cards (5.06:1). */
+  --muted-foreground: 215 16% 45%;
   --primary: 214 100% 40%; /* #0052CC Jira blue */
   --primary-foreground: 0 0% 100%;
   --primary-hover: 215 91% 34%; /* #0747A6 */
@@ -63,7 +65,9 @@
   --slop: 214 100% 40%;
   --accent: 214 100% 96%;
   --accent-foreground: 214 100% 40%;
-  --destructive: 8 82% 53%; /* #DE350B */
+  /* #DA3016 — darkened from #DE350B so white text on the destructive surface
+     (e.g. the notification badge, destructive buttons) clears WCAG AA: 4.76:1. */
+  --destructive: 8 82% 47%;
   --destructive-foreground: 0 0% 100%;
   --border: hsl(214 17% 90%); /* #DFE1E6 */
   --radius: 0.25rem; /* 4px — cards/containers */

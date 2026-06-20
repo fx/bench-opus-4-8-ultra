@@ -1,13 +1,8 @@
-import { Link } from "react-router-dom";
+import { AppShell } from "../features/demo/chrome/AppShell.tsx";
 
-// Placeholder demo page for the scaffold. Replaced by the Jira-parody demo app
-// in changes 0004+.
+// The /demo route renders the Jira-parody app shell (see docs/changes/0004). The
+// shell owns the themed chrome, store, and placeholder board; this route is a
+// thin entry point so the router (App.tsx) stays a plain route table.
 export function DemoPage() {
-  return (
-    <main>
-      <h1>Demo</h1>
-      <p>The agentic demo lives here.</p>
-      <Link to="/">Back to home</Link>
-    </main>
-  );
+  return <AppShell />;
 }
