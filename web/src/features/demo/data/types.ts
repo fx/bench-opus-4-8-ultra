@@ -61,6 +61,18 @@ export interface Issue {
   updatedAt: number;
 }
 
+// A single scripted step the simulated agent (0007) streams while "implementing"
+// an issue. `output` is the absurd text revealed incrementally over `durationMs`;
+// `label` is the terminal-style heading (e.g. "Analyzing requirements"). Defined
+// here beside the other demo models since the agent script, engine, and panel all
+// consume it. See docs/specs/demo-jira-clone › Agent Simulation Engine.
+export interface AgentStep {
+  id: string;
+  label: string;
+  output: string;
+  durationMs: number;
+}
+
 // The project context shown in the sidebar header.
 export interface Project {
   key: string; // "SLOP"

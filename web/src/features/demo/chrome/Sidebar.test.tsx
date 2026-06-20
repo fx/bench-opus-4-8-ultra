@@ -117,4 +117,32 @@ describe("Sidebar", () => {
     expect(boardLabel).toHaveClass("lg:inline");
     expect(screen.getByText("Collapse")).toHaveClass("lg:inline");
   });
+
+  it("navigates to the Rovo Agents roster and back to the Board (0007)", async () => {
+    const user = userEvent.setup();
+    render(<Sidebar />);
+
+    expect(useDemoStore.getState().activeView).toBe("board");
+
+    await user.click(screen.getByRole("button", { name: "Rovo Agents" }));
+    expect(useDemoStore.getState().activeView).toBe("agents");
+    expect(screen.getByRole("button", { name: "Rovo Agents" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    expect(screen.getByRole("button", { name: "Board" })).not.toHaveAttribute(
+      "aria-current",
+    );
+
+    await user.click(screen.getByRole("button", { name: "Board" }));
+    expect(useDemoStore.getState().activeView).toBe("board");
+  });
+
+  it("placeholder items (no view) do not navigate when clicked", async () => {
+    const user = userEvent.setup();
+    render(<Sidebar />);
+    // "Summary" has no `view` → onClick is undefined; clicking it is inert.
+    await user.click(screen.getByRole("button", { name: "Summary" }));
+    expect(useDemoStore.getState().activeView).toBe("board");
+  });
 });

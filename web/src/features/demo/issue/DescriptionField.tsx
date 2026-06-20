@@ -6,8 +6,9 @@ import { Button } from "../../../components/ui/button.tsx";
 // description; open-question default: click-to-edit inline). It reads as plain
 // text until clicked, then swaps to a textarea with Save / Cancel. Editing is
 // local component state committed up via `onSave` only on Save — Cancel and
-// Escape discard, restoring the last saved text. A slot (`aiSlot`) is exposed for
-// the 0007 "AI-generate description" sparkle without implementing it here.
+// Escape discard, restoring the last saved text. A slot (`aiSlot`) hosts the 0007
+// "✨ AI-generate description" action; it is shown ONLY in read mode (see the
+// render below) so generating can't be clobbered by a stale in-progress draft.
 //
 // Keyboard: Cmd/Ctrl+Enter saves, Escape cancels — both standard for an inline
 // editor — and every control carries a visible focus ring. The Escape-cancels
@@ -84,7 +85,13 @@ export function DescriptionField({
     <section aria-label="Description" className="flex flex-col gap-2">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold text-foreground">Description</h3>
-        {aiSlot}
+        {/* The "✨ AI-generate" action is offered ONLY in read mode. Generating
+            while the inline editor is open would write the new text to the store
+            but leave the textarea showing the stale local draft — a later Save
+            would then silently overwrite the generated text. Hiding the slot
+            during editing removes that footgun (the user generates from read mode,
+            or edits manually, never both at once). */}
+        {!editing && aiSlot}
       </div>
 
       {editing ? (

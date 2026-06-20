@@ -9,18 +9,15 @@
 
 Everything is fictional parody — but every interaction is built to feel completely real: real timing, real streaming output, real-looking UI.
 
-> **Status:** Scaffold + design system landed, the **landing page (`/`) ships in
-> full**, and the **demo app shell, its Kanban board, and the issue detail view
-> (`/demo`) are in place**. A single Go server serves a Bun/Vite/React SPA with
-> end-to-end hot reload in dev and embedded assets in prod, behind a
-> 100%-coverage CI gate. The `/demo` route now renders the Jira-look-alike shell
-> (chrome, store, seed) with a working **drag-and-drop Kanban board** and a
-> **two-column issue detail view** (status transitions, editable description,
-> activity feed + comments) opened by clicking a card (see *What exists now*); the
-> remaining demo features (the streaming agent, Autopilot, Ask Rovo, roster) are
-> still **planned**. See [`docs/`](docs/) for the living specifications and change
-> documents that drive implementation. As features ship, this README is updated to
-> describe what actually exists.
+> **Status:** Feature-complete. The **landing page (`/`)** ships in full and the
+> **demo (`/demo`)** is complete — the Jira-look-alike shell, the drag-and-drop
+> Kanban board, the issue detail view, **and the full agentic-AI parody** (the
+> streaming "Implement now with AI" agent, Agentic Autopilot, Ask Rovo, the Rovo
+> Agents roster, and AI-generate fields) are all in place. A single Go server
+> serves a Bun/Vite/React SPA with end-to-end hot reload in dev and embedded
+> assets in prod, behind a 100%-coverage CI gate. See [`docs/`](docs/) for the
+> living specifications and change documents that drove implementation. As
+> features ship, this README is updated to describe what actually exists.
 
 ---
 
@@ -77,8 +74,9 @@ Everything is fictional parody — but every interaction is built to feel comple
   `lg`). Demo state lives in a client-side **Zustand store** seeded from a
   deterministic mock dataset (the `SLOP` project, parody users including the
   "Rovo Ultra" agent, and 14 parody issues across all four columns), with
-  selectors and a `reset()` that restores the seed exactly. The agent features
-  are still **planned** (see below).
+  selectors and a `reset()` that restores the seed exactly. The "Ask Rovo" nav
+  entry and the "Rovo Agents" sidebar item are live (see *The agentic-AI parody*
+  below).
 
 - The **demo Kanban board** under
   [`web/src/features/demo/board`](web/src/features/demo/board): the main content
@@ -94,8 +92,8 @@ Everything is fictional parody — but every interaction is built to feel comple
   updates the issue's status and both affected column counts. The transition
   logic lives in the store (unit-tested in isolation), separate from the dnd
   wiring. Clicking a card opens the **issue detail view** (below); each card also
-  exposes a slot for the later "Implement now with AI" action (0007) without
-  implementing it yet.
+  surfaces the "✨ Implement now with AI" action on hover (see *The agentic-AI
+  parody* below).
 
 - The **demo issue detail view** under
   [`web/src/features/demo/issue`](web/src/features/demo/issue): clicking a board
@@ -112,9 +110,40 @@ Everything is fictional parody — but every interaction is built to feel comple
   board's drag uses, so the board reflects the new column immediately (single
   source of truth); closing the modal (Escape, overlay, or the close button)
   returns to the board. Relative timestamps come from a small util with an
-  **injectable "now"** for deterministic tests, and the detail exposes slots for
-  the 0007 streaming-agent panel and AI-generate-field buttons without
-  implementing them yet.
+  **injectable "now"** for deterministic tests, and the detail hosts the
+  streaming-agent panel and the AI-generate-field buttons described below.
+
+- **The agentic-AI parody** under
+  [`web/src/features/demo/agent`](web/src/features/demo/agent) and
+  [`web/src/features/demo/rovo`](web/src/features/demo/rovo) — the demo's
+  punchline, built to *feel* genuinely live while being a deterministic, offline,
+  fully-testable simulation (no LLM, no network):
+  - **"✨ Implement now with AI"** on every board card (hover slot) and in the
+    issue detail. Activating it opens an **agent panel** that streams a scripted,
+    terminal-style implementation log — ordered steps that transition
+    running → done with a blinking caret and word-by-word streaming — then
+    **"ships" the issue to Done**, marks it agent-handled, and records an
+    agent-authored run log in the activity feed. The user can **cancel mid-run**:
+    streaming stops promptly and the issue is left untouched (not Done). The
+    streaming is a *pure function of elapsed time* driven through an **injectable
+    clock**, so it's tested deterministically with fake timers (both the
+    completion and cancellation paths). Under `prefers-reduced-motion` the run
+    skips the slow reveal and shows the final result immediately.
+  - **Agentic Autopilot** — a board toggle that, while ON, autonomously ships
+    cards toward Done over time (seeded jitter via the same injectable clock);
+    toggling OFF halts further movement.
+  - **Ask Rovo** — the top-nav command bar opens a dialog that answers any query
+    with an over-confident, citation-laden, absurd **scripted** answer (citing
+    papers that do not exist).
+  - **Rovo Agents roster** — a sidebar destination listing absurd hireable agents
+    (Standup Bot, Scope Creep Detector, Blame Assigner, Velocity Inflator…) with
+    fabricated utilization/shipped stats and **Hire / Assign** actions.
+  - **AI-generate** sparkle buttons in the issue detail that fill the
+    summary/description with buzzword-bloat text and post an agent "Reply with AI"
+    comment — all through the store.
+  - Every introduced text-on-color (agent status, the AI buttons, roster avatars,
+    Autopilot/Ask Rovo chrome, citation chips) clears **WCAG AA**, locked by
+    contrast-guard tests; all JS-driven motion consults `useReducedMotionSafe`.
 
 ## Development
 
@@ -142,22 +171,14 @@ bun run test:web    # Vitest + 100% coverage thresholds
 
 ---
 
-## What's planned
+## Roadmap
 
-### The demo (`/demo`)
-
-A convincing Jira look-alike whose every feature is a joke (the chrome shell —
-top nav, collapsible sidebar, store, and seed — the **drag-and-drop Kanban
-board**, and the **issue detail view** already exist; see *What exists now*; the
-items below remain planned):
-
-- **"✨ Implement now with AI"** on every ticket — opens an agent panel that streams scripted, plausible implementation steps in real time and then "ships" the ticket
-- **Agentic Autopilot** — flip it on and watch tickets ship themselves
-- **Ask Rovo** — an AI command bar that answers any question with over-confident, citation-laden nonsense
-- A **Rovo Agents** roster of absurd hireable agents (Standup Bot, Scope Creep Detector, Blame Assigner, Velocity Inflator…)
-- AI-generate buttons that fill fields with bloated buzzword soup
-
-All demo data is mocked in the browser; the "AI" is a deterministic, scripted simulation (no real model, no network).
+Both faces of the product — the landing page (`/`) and the full Jira-parody demo
+(`/demo`, including the agentic-AI features) — are now implemented; see *What
+exists now*, the project's feature work is complete. The architecture reserves an
+`/api/*` namespace on the Go server for a future same-origin API, but no endpoints
+are defined yet. All demo data remains mocked in the browser and the "AI" is a
+deterministic, scripted simulation (no real model, no network).
 
 ---
 
