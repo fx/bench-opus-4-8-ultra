@@ -1,5 +1,6 @@
 import { ThemeScope } from "../../../components/ThemeScope.tsx";
 import { Board } from "../board/Board.tsx";
+import { IssueDetail } from "../issue/IssueDetail.tsx";
 import { useDemoStore } from "../store/store.ts";
 import { Sidebar } from "./Sidebar.tsx";
 import { TopNav } from "./TopNav.tsx";
@@ -18,6 +19,7 @@ import { TopNav } from "./TopNav.tsx";
 
 export function AppShell() {
   const project = useDemoStore((state) => state.project);
+  const openIssue = useDemoStore((state) => state.openIssue);
 
   return (
     <ThemeScope
@@ -39,10 +41,17 @@ export function AppShell() {
           </div>
 
           {/* The Kanban board (change 0005): four columns of draggable issue
-              cards with live counts, fed from the store. */}
-          <Board />
+              cards with live counts, fed from the store. A card click opens the
+              issue detail (change 0006) via the store's openIssue. */}
+          <Board onOpenIssue={openIssue} />
         </main>
       </div>
+
+      {/* The issue detail modal (change 0006). It reads the selected issue from
+          the store and is a no-op visually until a card is opened. Mounted at
+          the shell root so it overlays the whole demo, inside the Jira theme
+          scope. */}
+      <IssueDetail />
     </ThemeScope>
   );
 }

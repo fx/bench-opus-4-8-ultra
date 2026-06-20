@@ -1,6 +1,7 @@
 import { useMemo, type ReactNode } from "react";
 import {
   DndContext,
+  KeyboardCode,
   KeyboardSensor,
   PointerSensor,
   type DragEndEvent,
@@ -47,10 +48,22 @@ export function Board({ onOpenIssue, renderAiSlot }: BoardProps) {
   // pick up, arrows to move, Space to drop) per the change-0005 a11y goal. The
   // custom coordinate getter makes one arrow press jump a whole column (the
   // default getter steps 25px, which is unusable across ~288px columns).
+  //
+  // keyboardCodes overrides @dnd-kit's default start/end keys (Space AND Enter)
+  // to Space ONLY: with the issue-detail open wired (0006), Enter on a focused
+  // card opens the detail view, and the Card forwards that same Enter to this
+  // sensor. Were Enter still a drag-start key, opening would ALSO begin a
+  // keyboard drag behind the modal. Reserving Enter for "open" and Space for
+  // "drag" keeps both interactions distinct and accessible.
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
     useSensor(KeyboardSensor, {
       coordinateGetter: boardKeyboardCoordinateGetter,
+      keyboardCodes: {
+        start: [KeyboardCode.Space],
+        cancel: [KeyboardCode.Esc],
+        end: [KeyboardCode.Space],
+      },
     }),
   );
 

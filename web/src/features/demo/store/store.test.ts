@@ -1,11 +1,14 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
+  applyAddComment,
   applyMoveIssue,
+  applySetDescription,
   columnsFromIssues,
   selectAgentUser,
   selectColumns,
   selectIssueByKey,
   selectIssuesByStatus,
+  selectSelectedIssue,
   selectStatusCounts,
   selectTotalIssues,
   useDemoStore,
@@ -207,12 +210,231 @@ describe("reset", () => {
     const target = useDemoStore.getState().issues[0];
     useDemoStore.getState().setIssueStatus(target.key, "done", () => 1);
     useDemoStore.getState().setSidebarCollapsed(true);
+    useDemoStore.getState().openIssue(target.key);
 
     useDemoStore.getState().reset();
 
     const seed = createSeed();
     expect(useDemoStore.getState().issues).toEqual(seed.issues);
     expect(useDemoStore.getState().sidebarCollapsed).toBe(false);
+    // The open issue is cleared too, so reset returns to the board view.
+    expect(useDemoStore.getState().selectedIssueKey).toBeNull();
+  });
+});
+
+describe("issue detail open/close (0006)", () => {
+  it("starts with no issue selected", () => {
+    expect(useDemoStore.getState().selectedIssueKey).toBeNull();
+    expect(selectSelectedIssue(useDemoStore.getState())).toBeUndefined();
+  });
+
+  it("openIssue selects the key and selectSelectedIssue resolves the issue", () => {
+    const target = useDemoStore.getState().issues[0];
+    useDemoStore.getState().openIssue(target.key);
+    expect(useDemoStore.getState().selectedIssueKey).toBe(target.key);
+    expect(selectSelectedIssue(useDemoStore.getState())?.key).toBe(target.key);
+  });
+
+  it("selectSelectedIssue is undefined when the selected key resolves to no issue", () => {
+    useDemoStore.getState().openIssue("SLOP-000");
+    expect(useDemoStore.getState().selectedIssueKey).toBe("SLOP-000");
+    expect(selectSelectedIssue(useDemoStore.getState())).toBeUndefined();
+  });
+
+  it("closeIssue clears the selection", () => {
+    const target = useDemoStore.getState().issues[0];
+    useDemoStore.getState().openIssue(target.key);
+    useDemoStore.getState().closeIssue();
+    expect(useDemoStore.getState().selectedIssueKey).toBeNull();
+    expect(selectSelectedIssue(useDemoStore.getState())).toBeUndefined();
+  });
+});
+
+describe("setStatus (issue-detail transition, 0006)", () => {
+  it("transitions an issue so the board (column counts) reflects it — same path as a drag", () => {
+    const before = selectStatusCounts(useDemoStore.getState());
+    const todo = selectIssuesByStatus(useDemoStore.getState(), "todo")[0];
+
+    useDemoStore.getState().setStatus(todo.key, "done", () => 5);
+
+    const after = selectStatusCounts(useDemoStore.getState());
+    expect(after.todo).toBe(before.todo - 1);
+    expect(after.done).toBe(before.done + 1);
+    const moved = selectIssueByKey(useDemoStore.getState(), todo.key);
+    expect(moved?.status).toBe("done");
+    expect(moved?.updatedAt).toBe(5);
+  });
+
+  it("defaults to Date.now when no clock is injected", () => {
+    const todo = selectIssuesByStatus(useDemoStore.getState(), "todo")[0];
+    const before = Date.now();
+    useDemoStore.getState().setStatus(todo.key, "in_review");
+    const after = Date.now();
+    const moved = selectIssueByKey(useDemoStore.getState(), todo.key);
+    expect(moved?.status).toBe("in_review");
+    expect(moved?.updatedAt).toBeGreaterThanOrEqual(before);
+    expect(moved?.updatedAt).toBeLessThanOrEqual(after);
+  });
+
+  it("is a no-op (no notify) for a same-status change", () => {
+    const todo = selectIssuesByStatus(useDemoStore.getState(), "todo")[0];
+    const issuesBefore = useDemoStore.getState().issues;
+    const listener = vi.fn();
+    const unsubscribe = useDemoStore.subscribe(listener);
+
+    useDemoStore.getState().setStatus(todo.key, "todo", () => 1);
+
+    expect(useDemoStore.getState().issues).toBe(issuesBefore);
+    expect(listener).not.toHaveBeenCalled();
+    unsubscribe();
+  });
+});
+
+describe("applySetDescription (pure description reducer, 0006)", () => {
+  it("updates the description and bumps updatedAt via the injected clock", () => {
+    const state = useDemoStore.getState();
+    const target = state.issues[0];
+    const result = applySetDescription(state, target.key, "Rewritten", () => 8);
+
+    expect(result).not.toBe(state);
+    const issues = (result as { issues: typeof state.issues }).issues;
+    const updated = issues.find((i) => i.key === target.key);
+    expect(updated?.description).toBe("Rewritten");
+    expect(updated?.updatedAt).toBe(8);
+  });
+
+  it("is a no-op (same reference) for an unknown key", () => {
+    const state = useDemoStore.getState();
+    expect(applySetDescription(state, "SLOP-000", "x", () => 1)).toBe(state);
+  });
+
+  it("is a no-op (same reference) when the description is unchanged", () => {
+    const state = useDemoStore.getState();
+    const target = state.issues[0];
+    expect(
+      applySetDescription(state, target.key, target.description, () => 1),
+    ).toBe(state);
+  });
+});
+
+describe("setDescription store action (0006)", () => {
+  it("persists an edited description for the issue", () => {
+    const target = useDemoStore.getState().issues[0];
+    useDemoStore.getState().setDescription(target.key, "New text", () => 3);
+    const updated = selectIssueByKey(useDemoStore.getState(), target.key);
+    expect(updated?.description).toBe("New text");
+    expect(updated?.updatedAt).toBe(3);
+  });
+
+  it("defaults to Date.now when no clock is injected", () => {
+    const target = useDemoStore.getState().issues[0];
+    const before = Date.now();
+    useDemoStore.getState().setDescription(target.key, "Edited later");
+    const after = Date.now();
+    const updated = selectIssueByKey(useDemoStore.getState(), target.key);
+    expect(updated?.description).toBe("Edited later");
+    expect(updated?.updatedAt).toBeGreaterThanOrEqual(before);
+    expect(updated?.updatedAt).toBeLessThanOrEqual(after);
+  });
+});
+
+describe("applyAddComment (pure comment reducer, 0006)", () => {
+  it("prepends a comment authored by the given user with a clock-derived id/createdAt", () => {
+    const state = useDemoStore.getState();
+    const target = state.issues[0];
+    const author = state.users[1];
+    const existing = target.comments.length;
+
+    const result = applyAddComment(
+      state,
+      target.key,
+      "  Looks great  ",
+      author,
+      () => 100,
+    );
+
+    expect(result).not.toBe(state);
+    const issues = (result as { issues: typeof state.issues }).issues;
+    const updated = issues.find((i) => i.key === target.key);
+    expect(updated?.comments).toHaveLength(existing + 1);
+    // Prepended at index 0, body trimmed, author + deterministic id/createdAt.
+    const added = updated?.comments[0];
+    expect(added?.body).toBe("Looks great");
+    expect(added?.author).toBe(author);
+    expect(added?.createdAt).toBe(100);
+    expect(added?.id).toBe(`c-${target.key}-100`);
+    expect(updated?.updatedAt).toBe(100);
+  });
+
+  it("is a no-op (same reference) for a blank / whitespace-only body", () => {
+    const state = useDemoStore.getState();
+    const target = state.issues[0];
+    expect(
+      applyAddComment(state, target.key, "   ", state.users[0], () => 1),
+    ).toBe(state);
+  });
+
+  it("is a no-op (same reference) for an unknown key", () => {
+    const state = useDemoStore.getState();
+    expect(
+      applyAddComment(state, "SLOP-000", "hi", state.users[0], () => 1),
+    ).toBe(state);
+  });
+});
+
+describe("addComment store action (0006)", () => {
+  it("prepends a comment attributed to a non-agent teammate and orders newest-first", () => {
+    const target = useDemoStore
+      .getState()
+      .issues.find((i) => i.comments.length > 0)!;
+    const firstExisting = target.comments[0];
+
+    useDemoStore.getState().addComment(target.key, "Fresh take", () => 200);
+
+    const updated = selectIssueByKey(useDemoStore.getState(), target.key)!;
+    // Newest-first: the new comment is index 0, the previously-newest is index 1.
+    expect(updated.comments[0].body).toBe("Fresh take");
+    expect(updated.comments[0].author.isAgent).toBeFalsy();
+    expect(updated.comments[1]).toEqual(firstExisting);
+  });
+
+  it("ignores a blank submission (no churn, no notify)", () => {
+    const target = useDemoStore.getState().issues[0];
+    const issuesBefore = useDemoStore.getState().issues;
+    const listener = vi.fn();
+    const unsubscribe = useDemoStore.subscribe(listener);
+
+    useDemoStore.getState().addComment(target.key, "   ", () => 1);
+
+    expect(useDemoStore.getState().issues).toBe(issuesBefore);
+    expect(listener).not.toHaveBeenCalled();
+    unsubscribe();
+  });
+
+  it("defaults to Date.now when no clock is injected", () => {
+    const target = useDemoStore.getState().issues[0];
+    const before = Date.now();
+    useDemoStore.getState().addComment(target.key, "timed");
+    const after = Date.now();
+    const added = selectIssueByKey(useDemoStore.getState(), target.key)
+      ?.comments[0];
+    expect(added?.body).toBe("timed");
+    expect(added?.createdAt).toBeGreaterThanOrEqual(before);
+    expect(added?.createdAt).toBeLessThanOrEqual(after);
+  });
+
+  it("falls back to the first user when no non-agent teammate exists", () => {
+    // Drive currentUser's fallback branch: replace users with an agent-only set,
+    // then add a comment and assert it is attributed to that (only) user.
+    const onlyAgent = useDemoStore.getState().users.find((u) => u.isAgent)!;
+    useDemoStore.setState({ users: [onlyAgent] });
+    const target = useDemoStore.getState().issues[0];
+
+    useDemoStore.getState().addComment(target.key, "agent-only world", () => 9);
+
+    const added = selectIssueByKey(useDemoStore.getState(), target.key)
+      ?.comments[0];
+    expect(added?.author).toEqual(onlyAgent);
   });
 });
 

@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { AppShell } from "./AppShell.tsx";
 import { useDemoStore } from "../store/store.ts";
@@ -57,5 +58,26 @@ describe("AppShell", () => {
     const root = container.querySelector('[data-theme="jira"]');
     expect(root).toHaveClass("overflow-x-hidden");
     expect(root).toHaveClass("w-full");
+  });
+
+  it("opens the issue detail when a board card is clicked, and closes back to the board", async () => {
+    const user = userEvent.setup();
+    renderShell();
+
+    // The detail modal is not mounted until a card is clicked.
+    expect(screen.queryByTestId("issue-detail")).not.toBeInTheDocument();
+
+    const card = screen.getByText("Generate infinite AI slop with one click");
+    await user.click(card);
+
+    // Detail opens for the clicked card and the store records the selection.
+    const modal = screen.getByTestId("issue-detail");
+    expect(within(modal).getByText("SLOP-101")).toBeInTheDocument();
+    expect(useDemoStore.getState().selectedIssueKey).toBe("SLOP-101");
+
+    // Escape returns to the board (selection cleared, modal unmounted).
+    await user.keyboard("{Escape}");
+    expect(screen.queryByTestId("issue-detail")).not.toBeInTheDocument();
+    expect(useDemoStore.getState().selectedIssueKey).toBeNull();
   });
 });
