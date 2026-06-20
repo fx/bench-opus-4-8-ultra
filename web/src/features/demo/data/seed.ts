@@ -65,9 +65,14 @@ const hugh: User = {
 const users: User[] = [rovo, dawn, max, vera, grant, hugh];
 
 // ── Epics ───────────────────────────────────────────────────────────────────
+// Epic lozenges render white 10px/700 text on these brand colours, so each
+// MUST clear WCAG AA (white-on-color ≥ 4.5:1). The colours below are the darker,
+// AA-safe shades (same hues as the Atlaskit epic palette): purple 5.86:1, teal
+// 5.57:1 (darkened from #00857A which was a razor-thin 4.53:1), red 5.16:1
+// (darkened from #E2483D which failed at 4.02:1). Locked by seed-contrast.test.ts.
 const slopEngine: Epic = { name: "Slop Engine", color: "#6554C0" };
-const hypeGrowth: Epic = { name: "Hype & Growth", color: "#00857A" };
-const monetization: Epic = { name: "Monetization", color: "#E2483D" };
+const hypeGrowth: Epic = { name: "Hype & Growth", color: "#107569" };
+const monetization: Epic = { name: "Monetization", color: "#C9372C" };
 
 // A seeded comment helper to keep the issue list readable.
 function comment(
