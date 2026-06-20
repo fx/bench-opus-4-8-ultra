@@ -9,7 +9,62 @@
 
 Everything is fictional parody — but every interaction is built to feel completely real: real timing, real streaming output, real-looking UI.
 
-> **Status:** Specification phase. This README describes the **planned** product. See [`docs/`](docs/) for the living specifications and change documents that drive implementation. As features ship, this README is updated to describe what actually exists.
+> **Status:** Scaffold landed. The project skeleton — a single Go server that
+> serves a Bun/Vite/React SPA with end-to-end hot reload in dev and embedded
+> assets in prod, plus a 100%-coverage CI gate — now exists and runs. The
+> product **features** below (landing page, demo app) are still **planned**;
+> the routes currently render minimal placeholders. See [`docs/`](docs/) for the
+> living specifications and change documents that drive implementation. As
+> features ship, this README is updated to describe what actually exists.
+
+---
+
+## What exists now (scaffold)
+
+- A single **Go HTTP server** (`main.go` + `internal/server`) that serves
+  everything on one port (default `8080`, override with `PORT`) and selects its
+  mode from `APP_ENV`:
+  - **dev** (`APP_ENV=dev`) — reverse-proxies all non-API requests to the Vite
+    dev server (including the HMR websocket), so the browser only ever talks to
+    the Go port.
+  - **prod** (default) — serves the SPA from assets **embedded into the binary**
+    via `embed.FS`, with `Accept`-aware SPA fallback, genuine `404`s for missing
+    assets, and the cache-control split (hashed assets immutable, `index.html`
+    no-cache).
+- `GET /healthz` liveness probe (both modes) and a reserved `/api/*` namespace
+  (no endpoints yet).
+- A **Bun + Vite + React + TypeScript** SPA under [`web/`](web/) with React
+  Router and two placeholder routes (`/`, `/demo`).
+- **End-to-end hot reload** via one command: `bun run dev` runs Vite and `air`
+  concurrently; frontend edits Fast-Refresh through the Go port, Go edits
+  rebuild the binary without dropping Vite.
+- **100% test coverage** for both Go and TypeScript, enforced by a coverage gate
+  in **GitHub Actions CI** (build + tests + coverage + lint) that runs on every
+  push and PR to `main`.
+
+## Development
+
+Prerequisites: [Bun](https://bun.sh), [Go](https://go.dev) 1.26+, and
+[`air`](https://github.com/air-verse/air) (`go install github.com/air-verse/air@latest`).
+
+```sh
+# install dependencies — root (concurrently, used by `bun run dev`) and the web app
+bun install
+bun --cwd web install
+
+# run the whole stack with end-to-end hot reload (visit http://localhost:8080)
+bun run dev
+
+# build the production frontend (emits web/dist/, embedded by the Go binary)
+bun run build && go build -o slop-simulator .
+
+# tests + 100% coverage gates
+bun run test:go     # Go tests (-race) + coverage gate
+bun run test:web    # Vitest + 100% coverage thresholds
+```
+
+> `PORT` is honored by both the Go server and Vite's HMR client port, so the
+> single-port contract holds even when you override it (`PORT=3000 bun run dev`).
 
 ---
 
@@ -57,7 +112,7 @@ All demo data is mocked in the browser; the "AI" is a deterministic, scripted si
 - [`docs/specs/`](docs/specs/) — living specs (architecture, design-system, landing-page, demo-jira-clone)
 - [`docs/changes/`](docs/changes/) — change documents tracking the work to build them
 
-*No setup or usage instructions yet — they'll be added here as the scaffold lands.*
+See [**Development**](#development) above for how to run, build, and test the scaffold.
 
 ---
 

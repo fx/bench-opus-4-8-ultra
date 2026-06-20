@@ -5,7 +5,7 @@
 Scaffold the entire project: a single Go HTTP server that serves a Bun + TypeScript + React (Vite) SPA, with full end-to-end hot reload in development (Vite HMR + `air` Go reload through one port) and embedded static serving in production, plus a GitHub Actions CI pipeline enforcing 100% coverage from the first commit.
 
 **Spec:** [Architecture](../specs/architecture/)
-**Status:** draft
+**Status:** complete
 **Depends On:** —
 
 ## Motivation
@@ -99,20 +99,20 @@ The server MUST serve `index.html` for non-asset routes accepting `text/html`, r
 
 ## Tasks
 
-- [ ] Go server core — `main.go`, `internal/server` mux, mode selection, `/healthz`, `/api/*` reservation, with tests
-  - [ ] SPA-fallback + embed handler (`spa.go`) with `Accept`-aware fallback, real-404, cache headers + tests
-  - [ ] Dev reverse-proxy handler (`proxy.go`) to Vite incl. websocket passthrough + tests (httptest)
-  - [ ] `embed.FS` bootstrap — `web/embed.go` (package `web`, `//go:embed all:dist`) injected into the server, plus committed `web/dist/.gitkeep`/placeholder so the package compiles clean pre-build
-- [ ] Frontend scaffold — `web/` Bun + Vite + React + TS + React Router, two placeholder routes (`/`, `/demo`), `vite.config.ts` HMR settings, base test (Vitest + RTL) for the router
-- [ ] Dev hot-reload wiring — `.air.toml`, root `dev` script (`concurrently`), verify frontend HMR + Go reload through one port
-- [ ] Tooling & quality config — ESLint + formatter, `vitest.config.ts` with 100% thresholds, Go coverage gate script, `.gitignore` (incl. `web/dist`, `tmp`)
-- [ ] GitHub Actions CI — `.github/workflows/ci.yml` running build + Go tests/coverage + Vitest/coverage + lint, green on this PR
-- [ ] Update `README.md` to reflect the scaffolded stack and the single `bun run dev` workflow
+- [x] Go server core — `main.go`, `internal/server` mux, mode selection, `/healthz`, `/api/*` reservation, with tests
+  - [x] SPA-fallback + embed handler (`spa.go`) with `Accept`-aware fallback, real-404, cache headers + tests
+  - [x] Dev reverse-proxy handler (`proxy.go`) to Vite incl. websocket passthrough + tests (httptest)
+  - [x] `embed.FS` bootstrap — `web/embed.go` (package `web`, `//go:embed all:dist`) injected into the server, plus committed `web/dist/index.html` placeholder so the package compiles clean pre-build
+- [x] Frontend scaffold — `web/` Bun + Vite + React + TS + React Router, two placeholder routes (`/`, `/demo`), `vite.config.ts` HMR settings, base test (Vitest + RTL) for the router
+- [x] Dev hot-reload wiring — `.air.toml`, root `dev` script (`concurrently`), verify frontend HMR + Go reload through one port
+- [x] Tooling & quality config — ESLint + Prettier, `vitest.config.ts` with 100% thresholds, Go coverage gate script, `.gitignore` (incl. `web/dist`, `tmp`)
+- [x] GitHub Actions CI — `.github/workflows/ci.yml` running build + Go tests/coverage + Vitest/coverage + lint, green on this PR
+- [x] Update `README.md` to reflect the scaffolded stack and the single `bun run dev` workflow
 
 ## Open Questions
 
-- [ ] Embed placeholder strategy — committed placeholder `index.html` vs `.gitkeep` only — confirm the cleanest approach that keeps `go build` working pre-frontend-build.
-- [ ] Whether to add `-race` to the Go CI step from day one (recommended) — confirm.
+- [x] Embed placeholder strategy — **Resolved:** commit a minimal placeholder `web/dist/index.html` (not a bare `.gitkeep`). It keeps `//go:embed all:dist` compiling on a clean checkout AND gives the prod SPA handler a readable `index.html` so the server is exercisable before the real Vite build. `.gitignore` force-keeps that one file (`/web/dist/*` + `!/web/dist/index.html`); the real build overwrites it.
+- [x] Add `-race` to the Go CI step from day one — **Resolved: yes.** CI runs `go test -race -covermode=atomic`; the suite is race-clean.
 
 ## References
 
