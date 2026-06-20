@@ -3,10 +3,13 @@
 # Go coverage gate: enforces 100% statement coverage for all first-party Go
 # code, with a single, explicitly-justified exclusion.
 #
-# `go test -coverprofile` reports per-function coverage. Every function MUST be
-# at 100.0% EXCEPT functions on the justified exclusion list below. The script
-# fails (exit 1) if any non-excluded function is below 100%, or if the overall
-# total (recomputed AFTER removing excluded functions) is below 100%.
+# `go test -coverprofile` reports per-function coverage. This is a purely
+# per-function gate: every function reported by `go tool cover -func` MUST be at
+# 100.0% EXCEPT functions on the justified exclusion list below. The script
+# fails (exit 1) if ANY non-excluded function is below 100%. It does NOT compute
+# an aggregate/total percentage — the trailing `total:` line is ignored — so a
+# below-100% overall figure caused solely by an excluded function does not fail
+# the gate, while any gap in covered code does.
 #
 # Justified exclusions:
 #   - main.go ... main : the process bootstrap. It only wires os.Getenv, the
@@ -33,7 +36,8 @@ func_output="$(go tool cover -func="$PROFILE")"
 
 fail=0
 while IFS= read -r line; do
-  # Skip the trailing "total:" summary line; we recompute our own total.
+  # Ignore the trailing "total:" summary line; this gate checks each function
+  # individually and never evaluates an aggregate total.
   [[ "$line" == total:* ]] && continue
 
   # Lines look like: path/file.go:NN:\tFuncName\tPCT%

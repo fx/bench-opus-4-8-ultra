@@ -50,7 +50,7 @@ Prerequisites: [Bun](https://bun.sh), [Go](https://go.dev) 1.26+, and
 ```sh
 # install dependencies — root (concurrently, used by `bun run dev`) and the web app
 bun install
-bun --cwd web install
+bun install --cwd web
 
 # run the whole stack with end-to-end hot reload (visit http://localhost:8080)
 bun run dev

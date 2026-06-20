@@ -62,7 +62,8 @@ jobs:
 
       # --- Build ---------------------------------------------------------
       - name: Build frontend
-        run: bun --cwd web run build
+        run: bun run build
+        working-directory: web
 
       - name: Build Go binary
         run: go build $(go list ./... | grep -v /node_modules/)

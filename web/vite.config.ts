@@ -4,7 +4,14 @@ import react from "@vitejs/plugin-react";
 // The Go server is the single origin the developer visits. Vite runs behind it
 // and its HMR websocket must connect back to the Go port (PORT, default 8080),
 // not Vite's own 5173 — otherwise HMR would bypass the single-port contract.
-const goPort = Number(process.env.PORT ?? "8080");
+//
+// Parse PORT defensively: an unset, empty, non-numeric, or non-positive value
+// must fall back to 8080 rather than yield NaN (which would silently break the
+// HMR client port).
+const DEFAULT_GO_PORT = 8080;
+const parsedPort = Number(process.env.PORT);
+const goPort =
+  Number.isInteger(parsedPort) && parsedPort > 0 ? parsedPort : DEFAULT_GO_PORT;
 
 export default defineConfig({
   plugins: [react()],

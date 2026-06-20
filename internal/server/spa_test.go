@@ -85,9 +85,9 @@ func TestSPARootServesIndex(t *testing.T) {
 }
 
 func TestSPAMissingAssetWildcardAccept404(t *testing.T) {
-	// Spec scenario: a missing asset requested with Accept: */* (what browsers
-	// send for scripts/modules) MUST 404, not be masked by the SPA shell. The
-	// path has a .js extension, so it is treated as an asset despite */*.
+	// Spec scenario ("Missing asset 404s"): a missing asset requested with
+	// Accept: */* (what browsers send for scripts/modules) MUST 404, not be
+	// masked by the SPA shell. */* is not an HTML opt-in, so no fallback.
 	h := newTestSPA(t)
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/assets/missing.js", nil)
@@ -99,36 +99,36 @@ func TestSPAMissingAssetWildcardAccept404(t *testing.T) {
 	}
 }
 
-func TestSPAExtensionlessRouteWildcardAcceptFallsBack(t *testing.T) {
-	// A client-side route with no extension, requested with */*, is navigation
-	// and must serve the SPA shell.
+func TestSPAExistingAssetWildcardAcceptServed(t *testing.T) {
+	// A real asset requested with Accept: */* must still be served as-is — the
+	// */* rule only affects the MISS path (no fallback), never real files.
+	h := newTestSPA(t)
+	rec := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodGet, "/assets/app.js", nil)
+	req.Header.Set("Accept", "*/*")
+	h.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("existing asset with */* status = %d, want 200", rec.Code)
+	}
+	if rec.Body.String() != "APPJS" {
+		t.Fatalf("existing asset body = %q, want APPJS", rec.Body.String())
+	}
+}
+
+func TestSPADeepLinkWildcardAccept404(t *testing.T) {
+	// Even an extension-less client route gets 404 under Accept: */* — only an
+	// explicit text/html navigation request triggers the SPA fallback. (Real
+	// browsers send text/html for top-level navigations; see the deep-link
+	// test which covers the 200 path.)
 	h := newTestSPA(t)
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/demo/board", nil)
 	req.Header.Set("Accept", "*/*")
 	h.ServeHTTP(rec, req)
 
-	if rec.Code != http.StatusOK {
-		t.Fatalf("extensionless route with */* status = %d, want 200 (SPA fallback)", rec.Code)
-	}
-	if rec.Body.String() != "<!doctype html>INDEX" {
-		t.Fatalf("extensionless route body = %q, want index", rec.Body.String())
-	}
-}
-
-func TestIsAssetPath(t *testing.T) {
-	cases := map[string]bool{
-		"assets/app.js":  true,  // extension in final segment
-		"favicon.ico":    true,  // top-level file with extension
-		"demo":           false, // bare client route
-		"demo/board":     false, // nested client route, no extension
-		"":               false, // root (resolved to index earlier, but guard it)
-		"docs.v2/readme": false, // dot only in a directory segment, not the file
-	}
-	for path, want := range cases {
-		if got := isAssetPath(path); got != want {
-			t.Errorf("isAssetPath(%q) = %v, want %v", path, got, want)
-		}
+	if rec.Code != http.StatusNotFound {
+		t.Fatalf("extensionless route with */* status = %d, want 404 (not an HTML opt-in)", rec.Code)
 	}
 }
 

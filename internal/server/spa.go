@@ -45,16 +45,12 @@ func (h *spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Not a real file. Only fall back to the SPA shell for client-side
-	// navigation — never for a missing asset, so broken asset references
-	// surface as real 404s instead of being masked by a 200 index.html.
-	//
-	// A request is navigation when it both accepts HTML and targets an
-	// asset-less path (no file extension). The path check is essential because
-	// browsers request missing scripts/modules with `Accept: */*` (which
-	// accepts HTML); without it, `/assets/missing.js` would wrongly serve the
-	// SPA shell. Deep links like `/demo` have no extension and still fall back.
-	if !acceptsHTML(r) || isAssetPath(upath) {
+	// Not a real file. Only fall back to the SPA shell for navigation requests
+	// — those that explicitly accept text/html. A missing asset (e.g. a
+	// reference to a hashed .js that no longer exists) is requested with
+	// Accept: */* (or no Accept), so it gets a genuine 404 instead of being
+	// masked by a 200 index.html, surfacing the broken reference.
+	if !acceptsHTML(r) {
 		http.NotFound(w, r)
 		return
 	}
@@ -76,24 +72,14 @@ func (h *spaHandler) fileExists(name string) bool {
 	return !info.IsDir()
 }
 
-// acceptsHTML reports whether the request's Accept header opts into HTML,
-// covering "text/html" and the wildcard "*/*" that browsers send.
+// acceptsHTML reports whether the request explicitly opts into HTML via a
+// "text/html" token in its Accept header. The wildcard "*/*" deliberately does
+// NOT count: browsers send "*/*" when fetching scripts, modules, and images, so
+// treating it as an HTML opt-in would mask a missing asset behind a 200
+// index.html instead of a real 404. Navigation requests (full page loads /
+// deep links) send "text/html" and so still fall back to the SPA shell.
 func acceptsHTML(r *http.Request) bool {
-	accept := r.Header.Get("Accept")
-	return strings.Contains(accept, "text/html") || strings.Contains(accept, "*/*")
-}
-
-// isAssetPath reports whether upath looks like a static asset rather than a
-// client-side route, i.e. its final segment has a file extension (e.g.
-// "assets/app.js", "favicon.ico"). Such paths must never serve the SPA shell
-// on a miss — they get a real 404 — whereas extension-less paths like "demo"
-// are treated as navigation and fall back to index.html.
-func isAssetPath(upath string) bool {
-	base := upath
-	if i := strings.LastIndexByte(base, '/'); i >= 0 {
-		base = base[i+1:]
-	}
-	return strings.Contains(base, ".")
+	return strings.Contains(r.Header.Get("Accept"), "text/html")
 }
 
 // setCacheHeaders applies the production caching policy: content-hashed assets
