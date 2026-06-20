@@ -4,6 +4,19 @@ import "@testing-library/jest-dom/vitest";
 import { afterEach } from "vitest";
 import { cleanup } from "@testing-library/react";
 
+// jsdom does not implement ResizeObserver, which Radix's ScrollArea relies on.
+// A no-op polyfill lets those primitives render under tests without affecting
+// behavior (there is no layout to observe in jsdom).
+if (!("ResizeObserver" in globalThis)) {
+  class ResizeObserverStub {
+    observe(): void {}
+    unobserve(): void {}
+    disconnect(): void {}
+  }
+  globalThis.ResizeObserver =
+    ResizeObserverStub as unknown as typeof ResizeObserver;
+}
+
 afterEach(() => {
   cleanup();
 });

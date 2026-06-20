@@ -32,4 +32,14 @@ export default tseslint.config(
       globals: globals.node,
     },
   },
+  // shadcn/ui primitives intentionally co-export their `cva` variant helpers
+  // (e.g. buttonVariants) alongside the component, which the Fast-Refresh rule
+  // flags. These are static primitives, not HMR-sensitive app components, so the
+  // rule is disabled for the ui/ directory.
+  {
+    files: ["src/components/ui/**/*.{ts,tsx}"],
+    rules: {
+      "react-refresh/only-export-components": "off",
+    },
+  },
 );
