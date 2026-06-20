@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
   selectAgentUser,
   selectColumns,
@@ -82,10 +82,38 @@ describe("setIssueStatus", () => {
     expect(unchanged).toEqual(second);
   });
 
-  it("is a no-op for an unknown key", () => {
-    const before = useDemoStore.getState().issues;
+  it("is a true no-op for an unknown key — same state reference, no notification", () => {
+    const stateBefore = useDemoStore.getState();
+    const issuesBefore = stateBefore.issues;
+    const listener = vi.fn();
+    const unsubscribe = useDemoStore.subscribe(listener);
+
     useDemoStore.getState().setIssueStatus("SLOP-999", "done", () => 1);
-    expect(useDemoStore.getState().issues).toEqual(before);
+
+    // No update: the issues array keeps the same reference and no subscriber
+    // is notified (Zustand bails when the reducer returns the same state).
+    expect(useDemoStore.getState().issues).toBe(issuesBefore);
+    expect(listener).not.toHaveBeenCalled();
+    unsubscribe();
+  });
+
+  it("notifies subscribers and swaps the issues array for a known key", () => {
+    const target = useDemoStore.getState().issues[0];
+    const issuesBefore = useDemoStore.getState().issues;
+    const listener = vi.fn();
+    const unsubscribe = useDemoStore.subscribe(listener);
+
+    useDemoStore.getState().setIssueStatus(target.key, "in_review", () => 7);
+
+    // A real update: new array reference, listener fired, status transitioned.
+    expect(useDemoStore.getState().issues).not.toBe(issuesBefore);
+    expect(listener).toHaveBeenCalledTimes(1);
+    const updated = useDemoStore
+      .getState()
+      .issues.find((i) => i.key === target.key);
+    expect(updated?.status).toBe("in_review");
+    expect(updated?.updatedAt).toBe(7);
+    unsubscribe();
   });
 });
 

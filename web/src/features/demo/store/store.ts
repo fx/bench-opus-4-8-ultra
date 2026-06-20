@@ -46,11 +46,18 @@ export const useDemoStore = create<DemoState>((set) => ({
   setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
 
   setIssueStatus: (key, status, now = Date.now) =>
-    set((state) => ({
-      issues: state.issues.map((issue) =>
-        issue.key === key ? { ...issue, status, updatedAt: now() } : issue,
-      ),
-    })),
+    set((state) => {
+      // True no-op for an unknown key: return the SAME state reference so
+      // Zustand skips the update and does not notify subscribers (no needless
+      // re-renders). Only allocate a new issues array when a match is updated.
+      const index = state.issues.findIndex((issue) => issue.key === key);
+      if (index === -1) {
+        return state;
+      }
+      const issues = state.issues.slice();
+      issues[index] = { ...issues[index], status, updatedAt: now() };
+      return { issues };
+    }),
 
   reset: () => set({ ...createSeed(), sidebarCollapsed: false }),
 }));
