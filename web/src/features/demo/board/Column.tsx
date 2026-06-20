@@ -35,7 +35,14 @@ export function Column({
     <section
       aria-label={STATUS_LABELS[status]}
       data-status={status}
-      className="flex w-72 shrink-0 flex-col rounded-md bg-page"
+      // Fluid columns: each flexes to share the board width equally (flex-1 +
+      // basis-0) with a 240px floor (min-w-60) and a 360px cap. At desktop widths
+      // the four columns + gaps fit inside the board area (≈1008px at a 1280px
+      // viewport, so 4×240 + 3×12 = 996px fits — like real Jira, no "Done" cut
+      // off). When the board area is narrower than the four floors, min-w-60
+      // stops the columns shrinking further and the board's overflow-x-auto track
+      // scrolls instead of overflowing the document.
+      className="flex min-w-60 max-w-[360px] flex-1 basis-0 flex-col rounded-md bg-page"
     >
       {/* Column header: name + live count. */}
       <header className="flex items-center gap-2 px-3 pb-2 pt-3">
@@ -45,7 +52,13 @@ export function Column({
         <span
           data-testid="column-count"
           aria-label={`${count} issues`}
-          className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-border px-1.5 text-xs font-semibold text-muted-foreground"
+          // Subtle grey count pill (bg-border #E1E5EA), like real Jira. Text is
+          // text-foreground (#172B4D) not text-muted-foreground: muted (#607085)
+          // on the darker #E1E5EA pill is only 4.0:1 (fails WCAG AA for this
+          // 12px/600 text); foreground clears AA with wide margin (≈11:1) and
+          // reads as Jira's darker, more prominent count numerals. Guarded in
+          // styles/jira-contrast.test.ts.
+          className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-border px-1.5 text-xs font-semibold text-foreground"
         >
           {count}
         </span>

@@ -18,5 +18,7 @@ export function resolveDropStatus(
   if (typeof overId !== "string") {
     return null;
   }
-  return STATUS_ORDER.includes(overId as Status) ? (overId as Status) : null;
+  // Cast once: overId is a string here; check membership and return it as Status.
+  const status = overId as Status;
+  return STATUS_ORDER.includes(status) ? status : null;
 }

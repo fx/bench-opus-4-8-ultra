@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { KeyboardCode } from "@dnd-kit/core";
 import {
+  arrowStep,
   boardKeyboardCoordinateGetter,
   nextColumnCoordinates,
   type ColumnRect,
@@ -142,23 +143,57 @@ describe("boardKeyboardCoordinateGetter (dnd adapter)", () => {
       currentCoordinates: { x: 100, y: 50 },
       context,
     });
-    // Only `todo` remained a valid column → no column to the right → no move.
+    // Only `todo` remained a valid column → no column to the right → no move,
+    // but the arrow key still preventDefaults so the page doesn't scroll.
     expect(result).toBeUndefined();
-    expect(event.preventDefault).not.toHaveBeenCalled();
+    expect(event.preventDefault).toHaveBeenCalledTimes(1);
   });
 
-  it("returns undefined (no move) for a non-arrow key", () => {
+  it("preventDefaults an arrow at the board edge even though the card can't move", () => {
+    const context = makeContext([
+      { id: "todo", left: 0, top: 0, w: 200, h: 100 }, // centre (100, 50)
+      { id: "in_progress", left: 300, top: 0, w: 200, h: 100 }, // (400, 50)
+    ]);
+    const event = makeEvent(KeyboardCode.Right);
+    // Card is at the rightmost column (in_progress, x≈400) → no further move.
+    const result = boardKeyboardCoordinateGetter(event, {
+      active: "SLOP-101",
+      currentCoordinates: { x: 400, y: 50 },
+      context,
+    });
+    expect(result).toBeUndefined();
+    expect(event.preventDefault).toHaveBeenCalledTimes(1);
+  });
+
+  it("returns undefined and does NOT preventDefault for a non-arrow key", () => {
     const context = makeContext([
       { id: "todo", left: 0, top: 0, w: 200, h: 100 },
       { id: "in_progress", left: 300, top: 0, w: 200, h: 100 },
     ]);
     const event = makeEvent(KeyboardCode.Space);
-    expect(
-      boardKeyboardCoordinateGetter(event, {
-        active: "SLOP-101",
-        currentCoordinates: { x: 100, y: 50 },
-        context,
-      }),
-    ).toBeUndefined();
+    const result = boardKeyboardCoordinateGetter(event, {
+      active: "SLOP-101",
+      currentCoordinates: { x: 100, y: 50 },
+      context,
+    });
+    expect(result).toBeUndefined();
+    expect(event.preventDefault).not.toHaveBeenCalled();
+  });
+});
+
+describe("arrowStep", () => {
+  it("maps Left/Up to -1 (previous column)", () => {
+    expect(arrowStep(KeyboardCode.Left)).toBe(-1);
+    expect(arrowStep(KeyboardCode.Up)).toBe(-1);
+  });
+
+  it("maps Right/Down to +1 (next column)", () => {
+    expect(arrowStep(KeyboardCode.Right)).toBe(1);
+    expect(arrowStep(KeyboardCode.Down)).toBe(1);
+  });
+
+  it("maps any other key to 0", () => {
+    expect(arrowStep(KeyboardCode.Space)).toBe(0);
+    expect(arrowStep(KeyboardCode.Enter)).toBe(0);
   });
 });

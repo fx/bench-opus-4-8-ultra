@@ -23,9 +23,13 @@ function jiraBlock(): string {
 }
 
 // Read an `--token: H S% L%` triplet from the Jira block as [h, s, l] numbers.
+// Some tokens (e.g. --border) are emitted as a full `hsl(H S% L%)` color rather
+// than a bare triplet, so an optional `hsl(` prefix is tolerated.
 function token(name: string): [number, number, number] {
   const block = jiraBlock();
-  const re = new RegExp(`--${name}:\\s*([\\d.]+)\\s+([\\d.]+)%\\s+([\\d.]+)%`);
+  const re = new RegExp(
+    `--${name}:\\s*(?:hsl\\(\\s*)?([\\d.]+)\\s+([\\d.]+)%\\s+([\\d.]+)%`,
+  );
   const m = block.match(re);
   if (!m) {
     throw new Error(`token --${name} not found in jira theme`);
@@ -99,5 +103,24 @@ describe("Jira theme WCAG AA contrast", () => {
     const foreground = hslToRgb(token("foreground"));
     const page = hslToRgb(token("page"));
     expect(contrast(foreground, page)).toBeGreaterThanOrEqual(AA_NORMAL);
+  });
+
+  it("the board column count badge text clears AA on its grey pill", () => {
+    // The count pill (board Column) is bg-border (#E1E5EA) with text-foreground.
+    // muted-foreground (#607085) on that darker grey is only ~4.0:1 (fails AA for
+    // 12px/600 text), which is why the badge uses --foreground instead. Lock it:
+    // if a future edit lightens the text token below AA on the pill, this fails.
+    const foreground = hslToRgb(token("foreground"));
+    const border = hslToRgb(token("border"));
+    expect(contrast(foreground, border)).toBeGreaterThanOrEqual(AA_NORMAL);
+  });
+
+  it("muted lozenge text (points/labels) clears AA on the panel grey pill", () => {
+    // The story-points badge and label lozenges use text-muted-foreground on
+    // bg-panel (#F4F5F7). Unlike the count pill's darker #E1E5EA, panel is light
+    // enough that muted-foreground clears AA — guard it so it stays that way.
+    const muted = hslToRgb(token("muted-foreground"));
+    const panel = hslToRgb(token("panel"));
+    expect(contrast(muted, panel)).toBeGreaterThanOrEqual(AA_NORMAL);
   });
 });

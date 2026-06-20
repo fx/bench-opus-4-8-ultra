@@ -14,6 +14,20 @@ import { STATUS_ORDER, type Status } from "../data/types.ts";
 const PREV_KEYS = new Set<string>([KeyboardCode.Left, KeyboardCode.Up]);
 const NEXT_KEYS = new Set<string>([KeyboardCode.Right, KeyboardCode.Down]);
 
+// Map a key code to a column step: -1 (previous), +1 (next), or 0 (not an arrow
+// the board handles). Pulled out of nextColumnCoordinates so the direction is a
+// single, readable lookup (no nested ternary) and so the adapter can tell a
+// recognised arrow from any other key (to preventDefault on edge presses).
+export function arrowStep(key: string): -1 | 0 | 1 {
+  if (PREV_KEYS.has(key)) {
+    return -1;
+  }
+  if (NEXT_KEYS.has(key)) {
+    return 1;
+  }
+  return 0;
+}
+
 export interface ColumnRect {
   status: Status;
   // Centre point of the column's drop area, in the same coordinate space as the
@@ -33,7 +47,7 @@ export function nextColumnCoordinates(
   current: { x: number; y: number },
   columns: ColumnRect[],
 ): { x: number; y: number } | null {
-  const step = PREV_KEYS.has(key) ? -1 : NEXT_KEYS.has(key) ? 1 : 0;
+  const step = arrowStep(key);
   if (step === 0 || columns.length === 0) {
     return null;
   }
@@ -73,6 +87,13 @@ export const boardKeyboardCoordinateGetter: KeyboardCoordinateGetter = (
   event,
   { currentCoordinates, context },
 ) => {
+  // For any board arrow key, suppress the page's native scroll while a drag is
+  // active — even at a board edge where the card can't move further. Otherwise
+  // pressing Right on the last column would scroll the page mid-drag.
+  if (arrowStep(event.code) !== 0) {
+    event.preventDefault();
+  }
+
   const { droppableContainers, droppableRects } = context;
   const columns: ColumnRect[] = [];
   // droppableContainers is a Map<id, container>; iterate its ids.
@@ -93,10 +114,7 @@ export const boardKeyboardCoordinateGetter: KeyboardCoordinateGetter = (
   }
 
   const next = nextColumnCoordinates(event.code, currentCoordinates, columns);
-  if (next === null) {
-    return undefined;
-  }
-  // Prevent the page from scrolling while we reposition the dragged card.
-  event.preventDefault();
-  return next;
+  // null → no move (non-arrow key, or already at the edge); @dnd-kit keeps the
+  // card where it is. preventDefault for arrow keys already happened above.
+  return next ?? undefined;
 };
