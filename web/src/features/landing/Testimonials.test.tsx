@@ -10,7 +10,9 @@ describe("Testimonials", () => {
       expect(screen.getByText(`${t.title}, ${t.company}`)).toBeInTheDocument();
       expect(screen.getByText(t.name)).toBeInTheDocument();
       // The Radix Avatar renders the initials fallback (no external image).
-      expect(screen.getByText(t.initials)).toBeInTheDocument();
+      // The initials are violet text on a tinted dark chip, so they use the
+      // lighter accent-text token to clear WCAG AA.
+      expect(screen.getByText(t.initials)).toHaveClass("text-primary-text");
     }
   });
 });

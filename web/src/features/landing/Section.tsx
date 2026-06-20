@@ -31,7 +31,7 @@ export function Section({
         {(eyebrow || title || lede) && (
           <div className="mx-auto mb-12 max-w-2xl text-center">
             {eyebrow && (
-              <p className="mb-3 text-sm font-medium uppercase tracking-widest text-primary">
+              <p className="mb-3 text-sm font-medium uppercase tracking-widest text-primary-text">
                 {eyebrow}
               </p>
             )}

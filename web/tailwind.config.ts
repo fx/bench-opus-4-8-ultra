@@ -24,6 +24,11 @@ const config = {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
           hover: "hsl(var(--primary-hover))",
+          // Lighter accent violet for text/icons ON dark surfaces (eyebrow
+          // labels, step numerals, avatar initials) so violet-on-dark clears
+          // WCAG AA, where the darker --primary (tuned for white-on-violet
+          // button backgrounds) would not. See styles/themes.css.
+          text: "hsl(var(--primary-text))",
         },
         slop: "hsl(var(--slop))",
         muted: {

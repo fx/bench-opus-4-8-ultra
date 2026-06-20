@@ -28,9 +28,9 @@ export function Footer() {
                 <Link
                   key={social}
                   to="/demo"
-                  // Larger tap target: a padded inline-flex with a comfortable
-                  // min hit area instead of bare text.
-                  className="inline-flex min-h-11 items-center px-2 text-xs text-muted-foreground transition-colors hover:text-foreground"
+                  // ≥44×44 square tap target (short labels like "X" would
+                  // otherwise be far narrower than 44px), centered.
+                  className="inline-flex min-h-11 min-w-11 items-center justify-center px-2 text-xs text-muted-foreground transition-colors hover:text-foreground"
                 >
                   {social}
                 </Link>

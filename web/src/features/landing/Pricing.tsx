@@ -58,7 +58,7 @@ function TierCard({
           </span>
         )}
       </div>
-      <p className="mt-1 h-4 text-xs text-primary">{price.note ?? ""}</p>
+      <p className="mt-1 h-4 text-xs text-primary-text">{price.note ?? ""}</p>
 
       <ul className="mt-6 flex-1 space-y-3">
         {tier.features.map((feature) => (
@@ -67,7 +67,7 @@ function TierCard({
             className="flex items-start gap-2 text-sm text-muted-foreground"
           >
             <Check
-              className="mt-0.5 h-4 w-4 shrink-0 text-primary"
+              className="mt-0.5 h-4 w-4 shrink-0 text-primary-text"
               aria-hidden="true"
             />
             <span>{feature}</span>

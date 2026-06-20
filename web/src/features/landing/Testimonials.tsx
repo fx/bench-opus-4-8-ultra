@@ -24,7 +24,7 @@ export function Testimonials() {
             </blockquote>
             <div className="mt-6 flex items-center gap-3">
               <Avatar>
-                <AvatarFallback className="bg-primary/15 text-primary">
+                <AvatarFallback className="bg-primary/15 text-primary-text">
                   {t.initials}
                 </AvatarFallback>
               </Avatar>

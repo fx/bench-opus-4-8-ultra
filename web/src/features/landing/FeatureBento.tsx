@@ -45,7 +45,7 @@ function FeatureTile({ feature }: { feature: Feature }) {
         span,
       )}
     >
-      <span className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg border bg-primary/10 text-primary">
+      <span className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg border bg-primary/10 text-primary-text">
         <Icon className="h-5 w-5" aria-hidden="true" />
       </span>
       <h3 className="text-lg font-semibold text-foreground">{feature.name}</h3>

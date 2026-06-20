@@ -83,4 +83,17 @@ describe("Footer", () => {
       screen.getByRole("heading", { name: "Demo Destination" }),
     ).toBeInTheDocument();
   });
+
+  it("gives social links a ≥44×44 square tap target", () => {
+    renderFooter();
+    const footer = screen.getByRole("contentinfo");
+    // Short labels like "X" need a min width as well as height, so socials
+    // carry both min-h-11 and min-w-11 (44px) and center their content.
+    for (const social of FOOTER_SOCIALS) {
+      expect(within(footer).getByText(social)).toHaveClass(
+        "min-h-11",
+        "min-w-11",
+      );
+    }
+  });
 });

@@ -24,6 +24,9 @@ describe("HowItWorks", () => {
         screen.getByRole("heading", { name: step.title }),
       ).toBeInTheDocument();
       expect(screen.getByText(step.description)).toBeInTheDocument();
+      // The numeral is violet text on a dark card, so it uses the lighter
+      // accent-text token to clear WCAG AA.
+      expect(screen.getByText(step.numeral)).toHaveClass("text-primary-text");
     }
   });
 

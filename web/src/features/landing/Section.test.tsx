@@ -16,7 +16,10 @@ describe("Section", () => {
         <p>Body</p>
       </Section>,
     );
-    expect(screen.getByText("Eyebrow")).toBeInTheDocument();
+    // The eyebrow/overline is violet text on the dark page, so it uses the
+    // lighter accent-text token (text-primary-text) to clear WCAG AA — not the
+    // darker --primary used for button backgrounds.
+    expect(screen.getByText("Eyebrow")).toHaveClass("text-primary-text");
     expect(
       screen.getByRole("heading", { name: "A Title" }),
     ).toBeInTheDocument();

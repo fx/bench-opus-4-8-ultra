@@ -47,7 +47,7 @@ export function HowItWorks() {
           {HOW_IT_WORKS.map((step) => (
             <li key={step.numeral} className="relative">
               <FadeUp className="flex items-start gap-5 sm:gap-8">
-                <span className="z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full border bg-card font-mono text-sm font-semibold text-primary">
+                <span className="z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full border bg-card font-mono text-sm font-semibold text-primary-text">
                   {step.numeral}
                 </span>
                 <div className="pt-1">
