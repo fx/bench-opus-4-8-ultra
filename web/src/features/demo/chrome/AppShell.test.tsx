@@ -41,10 +41,15 @@ describe("AppShell", () => {
     expect(screen.getByText("Projects / Slop Simulator")).toBeInTheDocument();
   });
 
-  it("renders the placeholder board container", () => {
+  it("renders the Kanban board with its four columns", () => {
     renderShell();
-    expect(screen.getByTestId("board-placeholder")).toBeInTheDocument();
-    expect(screen.getByText("The board lands here.")).toBeInTheDocument();
+    expect(
+      screen.getByRole("region", { name: "Kanban board" }),
+    ).toBeInTheDocument();
+    // The board's four ordered columns are present.
+    for (const name of ["To Do", "In Progress", "In Review", "Done"]) {
+      expect(screen.getByRole("region", { name })).toBeInTheDocument();
+    }
   });
 
   it("clips horizontal overflow at the shell root so the document never scrolls sideways", () => {

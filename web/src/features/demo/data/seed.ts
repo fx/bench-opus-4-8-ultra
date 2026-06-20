@@ -24,50 +24,61 @@ const project: Project = {
 // ── Users ───────────────────────────────────────────────────────────────────
 // The cast of parody teammates plus the glowing "Rovo Ultra" agent that the
 // simulated-agent feature (0007) attributes shipped work to.
+//
+// avatarColor renders WHITE initials (CardMeta AssigneeAvatar, and the project
+// avatar in the sidebar), so every avatarColor MUST clear WCAG AA for white text
+// (≥4.5:1) with comfortable margin. The colours below are AA-safe shades of the
+// Atlaskit avatar palette; the ones that needed darkening from their original
+// brighter hues are noted inline. Locked by data/seed-contrast.test.ts.
 const rovo: User = {
   id: "rovo-ultra",
   name: "Rovo Ultra",
   initials: "RU",
-  avatarColor: "#6554C0",
+  avatarColor: "#6554C0", // purple 5.86:1 — OK as-is
   isAgent: true,
 };
 const dawn: User = {
   id: "dawn-prompter",
   name: "Dawn Prompter",
   initials: "DP",
-  avatarColor: "#0052CC",
+  avatarColor: "#0052CC", // blue 6.82:1 — OK as-is
 };
 const max: User = {
   id: "max-tokens",
   name: "Max Tokens",
   initials: "MT",
-  avatarColor: "#00857A",
+  avatarColor: "#0E7268", // teal, darkened from #00857A (razor-thin 4.53) → 5.79:1
 };
 const vera: User = {
   id: "vera-velocity",
   name: "Vera Velocity",
   initials: "VV",
-  avatarColor: "#BF63F3",
+  avatarColor: "#8044C7", // purple, darkened from #BF63F3 (3.34, FAIL) → 5.88:1
 };
 const grant: User = {
   id: "grant-funding",
   name: "Grant Funding",
   initials: "GF",
-  avatarColor: "#E2483D",
+  avatarColor: "#C9372C", // red, darkened from #E2483D (4.02, FAIL) → 5.16:1
 };
 const hugh: User = {
   id: "hugh-mann",
   name: "Hugh Mann",
   initials: "HM",
-  avatarColor: "#FF8B00",
+  avatarColor: "#9E5C00", // amber, darkened from #FF8B00 (2.35, FAIL) → 5.27:1
 };
 
 const users: User[] = [rovo, dawn, max, vera, grant, hugh];
 
 // ── Epics ───────────────────────────────────────────────────────────────────
+// Epic lozenges render white 10px/700 text on these brand colours, so each
+// MUST clear WCAG AA (white-on-color ≥ 4.5:1). The colours below are the darker,
+// AA-safe shades (same hues as the Atlaskit epic palette): purple 5.86:1, teal
+// 5.57:1 (darkened from #00857A which was a razor-thin 4.53:1), red 5.16:1
+// (darkened from #E2483D which failed at 4.02:1). Locked by seed-contrast.test.ts.
 const slopEngine: Epic = { name: "Slop Engine", color: "#6554C0" };
-const hypeGrowth: Epic = { name: "Hype & Growth", color: "#00857A" };
-const monetization: Epic = { name: "Monetization", color: "#E2483D" };
+const hypeGrowth: Epic = { name: "Hype & Growth", color: "#107569" };
+const monetization: Epic = { name: "Monetization", color: "#C9372C" };
 
 // A seeded comment helper to keep the issue list readable.
 function comment(
