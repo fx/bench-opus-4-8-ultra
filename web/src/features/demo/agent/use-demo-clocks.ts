@@ -31,10 +31,12 @@ export function useDemoClocks(): void {
     [advanceAgent],
   );
   useAgentClock(agentRunning && !reduced, tickAgent);
-  // Reduced motion: finish a live run IMMEDIATELY with one huge delta (no slow
-  // reveal, no caret), per the reduced-motion requirement — synchronously on the
-  // render where the run becomes active, rather than waiting for a timer tick.
-  // Advancing to done flips `agentRunning` false, so this effect won't re-fire.
+  // Reduced motion: finish a live run with one huge delta (no slow reveal, no
+  // caret), per the reduced-motion requirement. This runs in an effect right
+  // after the activating commit — NOT during render and NOT on a timer tick — so
+  // the run jumps straight to done and the final streamed text paints on the next
+  // frame, with no streaming animation. Advancing to done flips `agentRunning`
+  // false, so this effect won't re-fire.
   useEffect(() => {
     if (agentRunning && reduced) {
       advanceAgent(Number.MAX_SAFE_INTEGER);
