@@ -78,12 +78,15 @@ export function selectIssuesByStatus(
 // Issue count per status, with every column present (zero when empty) and in
 // board display order — what column headers render.
 export function selectStatusCounts(state: DemoState): Record<Status, number> {
+  // `satisfies` (not `as`) so TypeScript verifies every Status key is present
+  // and none are extra — if the Status union changes, this fails to compile
+  // instead of silently producing a partial/incorrect counts object.
   const counts = {
     todo: 0,
     in_progress: 0,
     in_review: 0,
     done: 0,
-  } as Record<Status, number>;
+  } satisfies Record<Status, number>;
   for (const issue of state.issues) {
     counts[issue.status] += 1;
   }
