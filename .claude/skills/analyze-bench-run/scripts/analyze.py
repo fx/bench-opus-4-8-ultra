@@ -54,12 +54,17 @@ def model_cost(model, inp, outp, cc5, cc1, cr):
 
 
 def parse_ts(s):
-    if not s:
+    if not s or not isinstance(s, str):
         return None
     try:
-        return datetime.datetime.fromisoformat(s.replace("Z", "+00:00"))
+        dt = datetime.datetime.fromisoformat(s.replace("Z", "+00:00"))
     except ValueError:
         return None
+    # Normalize naive timestamps to UTC so all datetimes are comparable
+    # (mixing naive and aware datetimes raises TypeError when sorting).
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=datetime.timezone.utc)
+    return dt
 
 
 def hm(seconds):
@@ -100,8 +105,9 @@ def analyze_log(path, model_hint=None):
             split = ccd.get("ephemeral_5m_input_tokens", 0) + ccd.get("ephemeral_1h_input_tokens", 0)
             a["cc5"] += max(0, u.get("cache_creation_input_tokens", 0) - split)
             a["turns"] += 1
-            if msg.get("model"):
-                a["model"] = msg["model"]
+            # Model may live on the message or inside usage; prefer message,
+            # fall back to usage, then keep any prior/meta-supplied value.
+            a["model"] = msg.get("model") or u.get("model") or a["model"]
         for blk in (msg.get("content") or []):
             if isinstance(blk, dict) and blk.get("type") == "tool_use":
                 a["tools"] += 1
@@ -184,6 +190,10 @@ def git_pr_diffstats(repo):
         if not m:
             continue
         n = int(m.group(1))
+        # git log is newest->oldest; keep the first (newest) commit for each PR
+        # number so reverts/re-merges/backports don't clobber it with an older one.
+        if n in out:
+            continue
         try:
             ns = subprocess.check_output(
                 ["git", "-C", repo, "diff", "--numstat", f"{h}^1", h],
@@ -216,11 +226,15 @@ def main():
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args()
 
-    pdir = args.project_dir or discover_project_dir(args.repo)
+    pdir = (os.path.expanduser(args.project_dir) if args.project_dir
+            else discover_project_dir(args.repo))
     if not pdir or not os.path.isdir(pdir):
         sys.exit(f"error: could not find session log dir (tried {pdir}). "
                  f"Pass it explicitly or use --repo.")
-    pr_map = json.loads(args.pr_map)
+    try:
+        pr_map = json.loads(args.pr_map)
+    except (json.JSONDecodeError, ValueError) as e:
+        sys.exit(f"error: --pr-map is not valid JSON: {e}")
 
     rows = collect_logs(pdir)
     if not rows:
@@ -254,22 +268,22 @@ def main():
     print("=" * 104)
     print(f"PER-AGENT / SESSION BREAKDOWN   ({pdir})")
     print("=" * 104)
-    hdr = (f"{'agent/session':<30}{'turns':>6}{'tools':>6}{'input':>9}"
-           f"{'cache_wr':>10}{'cache_rd':>13}{'output':>9}{'wall':>8}{'cost':>9}")
+    hdr = (f"{'agent/session':<30} {'turns':>6} {'tools':>6} {'input':>11}"
+           f" {'cache_wr':>11} {'cache_rd':>14} {'output':>10} {'wall':>8} {'cost':>9}")
     print(hdr + "\n" + "-" * len(hdr))
     tot = defaultdict(int)
     tcost = 0.0
     for a in agents:
-        print(f"{a['name'][:30]:<30}{a['turns']:>6}{a['tools']:>6}"
-              f"{fmt(a['inp']):>9}{fmt(a['cc5'] + a['cc1']):>10}{fmt(a['cr']):>13}"
-              f"{fmt(a['outp']):>9}{hm(a['wall']):>8}{'$' + format(a['cost'], '.2f'):>9}")
+        print(f"{a['name'][:30]:<30} {a['turns']:>6} {a['tools']:>6}"
+              f" {fmt(a['inp']):>11} {fmt(a['cc5'] + a['cc1']):>11} {fmt(a['cr']):>14}"
+              f" {fmt(a['outp']):>10} {hm(a['wall']):>8} {'$' + format(a['cost'], '.2f'):>9}")
         for k in ("inp", "outp", "cc5", "cc1", "cr", "turns", "tools"):
             tot[k] += a[k]
         tcost += a["cost"]
     print("-" * len(hdr))
-    print(f"{'TOTAL (' + str(len(agents)) + ' logs)':<30}{tot['turns']:>6}{tot['tools']:>6}"
-          f"{fmt(tot['inp']):>9}{fmt(tot['cc5'] + tot['cc1']):>10}{fmt(tot['cr']):>13}"
-          f"{fmt(tot['outp']):>9}{'':>8}{'$' + format(tcost, '.2f'):>9}")
+    print(f"{'TOTAL (' + str(len(agents)) + ' logs)':<30} {tot['turns']:>6} {tot['tools']:>6}"
+          f" {fmt(tot['inp']):>11} {fmt(tot['cc5'] + tot['cc1']):>11} {fmt(tot['cr']):>14}"
+          f" {fmt(tot['outp']):>10} {'':>8} {'$' + format(tcost, '.2f'):>9}")
 
     # ---- role breakdown ----
     print("\n" + "=" * 104 + "\nBY ROLE\n" + "=" * 104)
@@ -280,12 +294,12 @@ def main():
         for k in ("turns", "outp", "billed"):
             r[k] += a[k]
         r["cost"] += a["cost"]
-    print(f"{'role':<18}{'#':>4}{'turns':>8}{'output':>11}{'billed':>15}{'cost':>10}")
+    print(f"{'role':<18} {'#':>4} {'turns':>8} {'output':>11} {'billed':>15} {'cost':>10}")
     for rn in ("orchestrator", "coder", "ultra-verifier", "ultra-designer", "ultra-judge", "other"):
         if rn in roles:
             r = roles[rn]
-            print(f"{rn:<18}{r['n']:>4}{r['turns']:>8}{r['outp']:>11,}"
-                  f"{r['billed']:>15,}{'$' + format(r['cost'], '.2f'):>10}")
+            print(f"{rn:<18} {r['n']:>4} {r['turns']:>8} {r['outp']:>11,}"
+                  f" {r['billed']:>15,} {'$' + format(r['cost'], '.2f'):>10}")
 
     # ---- token + cost totals ----
     billed = tot["inp"] + tot["cc5"] + tot["cc1"] + tot["cr"] + tot["outp"]
@@ -317,14 +331,14 @@ def main():
             per[p]["billed"] += a["billed"]
             per[p]["cost"] += a["cost"]
             per[p]["agents"] += 1
-        h2 = (f"{'PR':<5}{'title':<32}{'+lines':>8}{'-lines':>8}{'files':>6}"
-              f"{'agents':>7}{'output':>9}{'cost':>9}")
+        h2 = (f"{'PR':<5} {'title':<32} {'+lines':>8} {'-lines':>8} {'files':>6}"
+              f" {'agents':>7} {'output':>9} {'cost':>9}")
         print(h2 + "\n" + "-" * len(h2))
         for n in sorted(diffs):
             add, rem, files, title = diffs[n]
             d = per.get(n, dict(out=0, billed=0, cost=0.0, agents=0))
-            print(f"#{n:<4}{title[:32]:<32}{add:>8,}{rem:>8,}{files:>6}"
-                  f"{d['agents']:>7}{d['out']:>9,}{'$' + format(d['cost'], '.2f'):>9}")
+            print(f"#{n:<4} {title[:32]:<32} {add:>8,} {rem:>8,} {files:>6}"
+                  f" {d['agents']:>7} {d['out']:>9,} {'$' + format(d['cost'], '.2f'):>9}")
         if unattributed:
             print(f"\n  note: {len(unattributed)} sub-agent(s) had no 'prN' in their name and "
                   f"were not attributed to a PR: {', '.join(sorted(set(unattributed)))}")

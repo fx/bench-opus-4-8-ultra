@@ -220,83 +220,83 @@ is far larger than tokens actually generated.
 ========================================================================================================
 PER-AGENT / SESSION BREAKDOWN   (/home/vscode/.claude/projects/-workspace-bench-opus-4-8-ultra)
 ========================================================================================================
-agent/session                  turns tools    input  cache_wr     cache_rd   output    wall     cost
-----------------------------------------------------------------------------------------------------
-main:28d56421                    679   273   82,651 4,086,894  189,107,201  663,037  11h24m  $152.41
-main:c89942a2                     83    41   35,704   811,294   12,685,412   79,883  50m57s   $16.63
-coder-0001                       397   229  172,778 1,680,157   47,178,271   73,847  30m48s   $36.80
-ultra-verify-pr1                  78    45   36,252   430,661    4,695,852   15,767   5m06s    $5.61
-ultra-judge-pr1                   35    22   28,290   179,223    1,537,248    4,477   1m45s    $2.14
-coder-0002                       411   246   76,026   492,935   54,873,960   77,098  31m09s   $32.83
-ultra-verify-pr2                 163    98   41,850   355,348   15,064,436   23,238   9m56s   $10.54
-ultra-judge-pr2                   39    21   26,720   218,434    1,666,145    5,282   2m23s    $2.46
-coder-0003                       576   349  224,779 3,082,410  111,249,368  109,656   1h34m   $78.76
-coder-0004                       461   256  194,138 4,598,490   78,993,060   89,227   2h18m   $71.44
-ultra-verify-pr4                 159    98   38,011   368,453   14,448,978   16,314   8m27s   $10.13
-ultra-design-pr4                 141    83   32,919   367,641   12,344,471   30,308  11m05s    $9.39
-ultra-verify-pr3                 119    69   36,588   373,455   10,305,280   24,725   8m33s    $8.29
-ultra-design-pr4-rerun           139    83   32,594   260,254    9,722,416   22,393   9m06s    $7.21
-ultra-design-pr3                 137    83   45,398   309,175   11,215,491   21,533   8m19s    $8.31
-ultra-design-pr4-final           111    65   33,322   235,564    7,285,248   17,971   6m25s    $5.73
-ultra-judge-pr4                   44    26   25,684   159,076    1,919,331    6,893   2m54s    $2.25
-ultra-design-pr3-rerun            90    55   30,509   252,592    4,904,218   13,691   5m14s    $4.53
-ultra-design-pr3-final            79    44   27,830   187,582    4,478,182   15,095   4m59s    $3.93
-ultra-judge-pr3                   58    34   29,686   247,067    3,181,432   10,509   3m28s    $3.55
-coder-0005                       598   350  230,924 3,536,749  111,068,303  111,296   1h20m   $81.58
-ultra-verify-pr5                 115    69   33,784   290,078    9,471,920   18,420   7m37s    $7.18
-ultra-design-pr5                 114    70   36,315   353,087    8,739,906   19,372   6m07s    $7.24
-ultra-design-pr5-final            88    52   30,580   212,506    5,634,433   16,692   6m44s    $4.72
-ultra-design-pr5-confirm         108    65   31,192   267,715    8,244,482   21,841   7m04s    $6.50
-ultra-design-pr5-last            139    83   46,511   314,237   11,910,804   24,549   9m42s    $8.77
-ultra-judge-pr5                   50    30   29,478   205,230    2,548,630    7,562   2m59s    $2.89
-coder-0006                       428   248  148,223 3,073,020   74,374,923   86,000   1h58m   $59.28
-ultra-verify-pr6                 181   117   35,782   257,574   17,278,915   19,315  10m06s   $10.91
-ultra-design-pr6                 127    75   58,875   526,654   10,304,093   24,333   9m20s    $9.35
-ultra-design-pr6-rerun           144    89   32,976   218,833   10,030,761   16,235   8m35s    $6.95
-ultra-judge-pr6                   62    31   28,858   193,279    3,506,810    9,425   4m21s    $3.34
-coder-0007                       647   369  191,455 8,667,237  152,893,162  156,701   3h09m  $135.49
-ultra-verify-pr7                 156    97   38,561   442,024   16,831,599   24,608   9m43s   $11.99
-ultra-design-pr7                 241   136   42,592   396,848   28,920,863   44,611  16m32s   $18.27
-ultra-design-pr7-rerun           163    97   36,166   255,645   12,760,017   32,870  11m27s    $8.98
-ultra-judge-pr7                   55    31   28,844   199,233    3,039,631    9,412   3m30s    $3.14
-----------------------------------------------------------------------------------------------------
-TOTAL (37 logs)                 7415  42292,332,84538,106,6541,084,415,2521,964,186          $859.51
+agent/session                   turns  tools       input    cache_wr       cache_rd     output     wall      cost
+-----------------------------------------------------------------------------------------------------------------
+main:28d56421                     679    273      82,651   4,086,894    189,107,201    663,037   11h24m   $152.41
+main:c89942a2                     207     99      39,611   1,012,064     53,910,822    178,917    1h42m    $41.75
+coder-0001                        397    229     172,778   1,680,157     47,178,271     73,847   30m48s    $36.80
+ultra-verify-pr1                   78     45      36,252     430,661      4,695,852     15,767    5m06s     $5.61
+ultra-judge-pr1                    35     22      28,290     179,223      1,537,248      4,477    1m45s     $2.14
+coder-0002                        411    246      76,026     492,935     54,873,960     77,098   31m09s    $32.83
+ultra-verify-pr2                  163     98      41,850     355,348     15,064,436     23,238    9m56s    $10.54
+ultra-judge-pr2                    39     21      26,720     218,434      1,666,145      5,282    2m23s     $2.46
+coder-0003                        576    349     224,779   3,082,410    111,249,368    109,656    1h34m    $78.76
+coder-0004                        461    256     194,138   4,598,490     78,993,060     89,227    2h18m    $71.44
+ultra-verify-pr4                  159     98      38,011     368,453     14,448,978     16,314    8m27s    $10.13
+ultra-design-pr4                  141     83      32,919     367,641     12,344,471     30,308   11m05s     $9.39
+ultra-verify-pr3                  119     69      36,588     373,455     10,305,280     24,725    8m33s     $8.29
+ultra-design-pr4-rerun            139     83      32,594     260,254      9,722,416     22,393    9m06s     $7.21
+ultra-design-pr3                  137     83      45,398     309,175     11,215,491     21,533    8m19s     $8.31
+ultra-design-pr4-final            111     65      33,322     235,564      7,285,248     17,971    6m25s     $5.73
+ultra-judge-pr4                    44     26      25,684     159,076      1,919,331      6,893    2m54s     $2.25
+ultra-design-pr3-rerun             90     55      30,509     252,592      4,904,218     13,691    5m14s     $4.53
+ultra-design-pr3-final             79     44      27,830     187,582      4,478,182     15,095    4m59s     $3.93
+ultra-judge-pr3                    58     34      29,686     247,067      3,181,432     10,509    3m28s     $3.55
+coder-0005                        598    350     230,924   3,536,749    111,068,303    111,296    1h20m    $81.58
+ultra-verify-pr5                  115     69      33,784     290,078      9,471,920     18,420    7m37s     $7.18
+ultra-design-pr5                  114     70      36,315     353,087      8,739,906     19,372    6m07s     $7.24
+ultra-design-pr5-final             88     52      30,580     212,506      5,634,433     16,692    6m44s     $4.72
+ultra-design-pr5-confirm          108     65      31,192     267,715      8,244,482     21,841    7m04s     $6.50
+ultra-design-pr5-last             139     83      46,511     314,237     11,910,804     24,549    9m42s     $8.77
+ultra-judge-pr5                    50     30      29,478     205,230      2,548,630      7,562    2m59s     $2.89
+coder-0006                        428    248     148,223   3,073,020     74,374,923     86,000    1h58m    $59.28
+ultra-verify-pr6                  181    117      35,782     257,574     17,278,915     19,315   10m06s    $10.91
+ultra-design-pr6                  127     75      58,875     526,654     10,304,093     24,333    9m20s     $9.35
+ultra-design-pr6-rerun            144     89      32,976     218,833     10,030,761     16,235    8m35s     $6.95
+ultra-judge-pr6                    62     31      28,858     193,279      3,506,810      9,425    4m21s     $3.34
+coder-0007                        647    369     191,455   8,667,237    152,893,162    156,701    3h09m   $135.49
+ultra-verify-pr7                  156     97      38,561     442,024     16,831,599     24,608    9m43s    $11.99
+ultra-design-pr7                  241    136      42,592     396,848     28,920,863     44,611   16m32s    $18.27
+ultra-design-pr7-rerun            163     97      36,166     255,645     12,760,017     32,870   11m27s     $8.98
+ultra-judge-pr7                    55     31      28,844     199,233      3,039,631      9,412    3m30s     $3.14
+-----------------------------------------------------------------------------------------------------------------
+TOTAL (37 logs)                  7539   4287   2,336,752  38,307,424  1,125,640,662  2,063,220            $884.63
 
 ========================================================================================================
 BY ROLE
 ========================================================================================================
-role                 #   turns     output         billed      cost
-orchestrator         2     762    742,920    207,552,076   $169.04
-coder                7    3518    703,825    657,704,193   $496.17
-ultra-verifier       7     971    142,387     91,017,788    $64.65
-ultra-designer      14    1821    321,494    151,492,991   $109.86
-ultra-judge          7     343     53,560     19,051,889    $19.79
+role                  #    turns      output          billed       cost
+orchestrator          2      886     841,954     249,081,197    $194.16
+coder                 7     3518     703,825     657,704,193    $496.17
+ultra-verifier        7      971     142,387      91,017,788     $64.65
+ultra-designer       14     1821     321,494     151,492,991    $109.86
+ultra-judge           7      343      53,560      19,051,889     $19.79
 
 ========================================================================================================
 TOKEN TOTALS + COST
 ========================================================================================================
-  input (uncached)              2,332,845
+  input (uncached)              2,336,752
   cache write 5m               33,208,466
-  cache write 1h                4,898,188
-  cache read (reuse)        1,084,415,252
-  output (generated)            1,964,186
+  cache write 1h                5,098,958
+  cache read (reuse)        1,125,640,662
+  output (generated)            2,063,220
   ----
-  TOTAL billed tokens       1,126,818,937   (1126.8M)
-  cache-read share                  96.2%
-  ESTIMATED COST                  $859.51   (list price; excludes discounts)
+  TOTAL billed tokens       1,168,348,058   (1168.3M)
+  cache-read share                  96.3%
+  ESTIMATED COST                  $884.63   (list price; excludes discounts)
 
 ========================================================================================================
 PER-PR (git diffstat + attributed agent cost)
 ========================================================================================================
-PR   title                             +lines  -lines files agents   output     cost
-------------------------------------------------------------------------------------
-#1   feat: scaffold Go server + Vite/   2,333      18    39      3   94,091   $44.56
-#2   feat: add design-system foundati   2,745      12    62      3  105,618   $45.83
-#3   feat: add demo Jira-style app sh   1,752      45    22      6  174,780  $100.03
-#4   feat: build parody AI-SaaS landi   2,933      59    49      6  203,535  $113.47
-#5   feat: add demo Kanban board with   2,030      55    32      7  219,732  $118.87
-#6   feat: add demo issue detail view   2,386      28    31      5  155,308   $89.84
-#7   feat: add simulated agentic AI f   4,204     114    45      5  268,202  $177.87
+PR    title                              +lines   -lines  files  agents    output      cost
+-------------------------------------------------------------------------------------------
+#1    feat: scaffold Go server + Vite/    2,333       18     39       3    94,091    $44.56
+#2    feat: add design-system foundati    2,745       12     62       3   105,618    $45.83
+#3    feat: add demo Jira-style app sh    1,752       45     22       6   174,780   $100.03
+#4    feat: build parody AI-SaaS landi    2,933       59     49       6   203,535   $113.47
+#5    feat: add demo Kanban board with    2,030       55     32       7   219,732   $118.87
+#6    feat: add demo issue detail view    2,386       28     31       5   155,308    $89.84
+#7    feat: add simulated agentic AI f    4,204      114     45       5   268,202   $177.87
 
-PR links seen in transcript: https://github.com/fx/bench-opus-4-8-ultra/pull/1, https://github.com/fx/bench-opus-4-8-ultra/pull/2, https://github.com/fx/bench-opus-4-8-ultra/pull/3, https://github.com/fx/bench-opus-4-8-ultra/pull/4, https://github.com/fx/bench-opus-4-8-ultra/pull/5, https://github.com/fx/bench-opus-4-8-ultra/pull/6, https://github.com/fx/bench-opus-4-8-ultra/pull/7
+PR links seen in transcript: https://github.com/fx/bench-opus-4-8-ultra/pull/1, https://github.com/fx/bench-opus-4-8-ultra/pull/2, https://github.com/fx/bench-opus-4-8-ultra/pull/3, https://github.com/fx/bench-opus-4-8-ultra/pull/4, https://github.com/fx/bench-opus-4-8-ultra/pull/5, https://github.com/fx/bench-opus-4-8-ultra/pull/6, https://github.com/fx/bench-opus-4-8-ultra/pull/7, https://github.com/fx/bench-opus-4-8-ultra/pull/8, https://github.com/fx/bench/pull/2
 ```

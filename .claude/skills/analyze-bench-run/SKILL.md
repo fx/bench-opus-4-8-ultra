@@ -47,8 +47,9 @@ python3 .claude/skills/analyze-bench-run/scripts/analyze.py
 
 Options:
 
-- `python3 .../analyze.py /abs/path/to/~/.claude/projects/<slug>` — analyze a
-  specific project dir instead of the auto-discovered one.
+- `python3 .../analyze.py ~/.claude/projects/<slug>` — analyze a specific
+  project dir instead of the auto-discovered one (accepts `~` or a fully
+  expanded absolute path such as `/home/<user>/.claude/projects/<slug>`).
 - `--repo PATH` — point at a different git repo for the per-PR diffstats
   (default: cwd).
 - `--pr-map '{"coder-0001":1,"coder-0004":3}'` — attribute coder sub-agents to
