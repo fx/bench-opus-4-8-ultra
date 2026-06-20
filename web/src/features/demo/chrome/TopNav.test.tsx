@@ -60,4 +60,44 @@ describe("TopNav", () => {
     renderNav({ className: "custom-nav" });
     expect(screen.getByRole("banner")).toHaveClass("custom-nav");
   });
+
+  // Responsive degradation so the bar never forces horizontal overflow < lg.
+  it("clips overflow on the header so it never produces document scroll", () => {
+    renderNav();
+    expect(screen.getByRole("banner")).toHaveClass("overflow-hidden");
+  });
+
+  it("hides the wordmark caption below lg while keeping the mark", () => {
+    renderNav();
+    const caption = screen.getByText("Slop Jira");
+    expect(caption).toHaveClass("hidden");
+    expect(caption).toHaveClass("lg:inline");
+  });
+
+  it("drops the secondary Help and Settings icons below lg", () => {
+    renderNav();
+    expect(screen.getByRole("button", { name: "Help" })).toHaveClass("hidden");
+    expect(screen.getByRole("button", { name: "Help" })).toHaveClass(
+      "lg:inline-flex",
+    );
+    expect(screen.getByRole("button", { name: "Settings" })).toHaveClass(
+      "hidden",
+    );
+    expect(screen.getByRole("button", { name: "Settings" })).toHaveClass(
+      "lg:inline-flex",
+    );
+  });
+
+  it("keeps the primary affordances reachable at every breakpoint", () => {
+    renderNav();
+    // These must NOT carry a `hidden` class — always visible.
+    for (const name of [
+      "App switcher",
+      "Create",
+      "Ask Rovo",
+      "Notifications",
+    ]) {
+      expect(screen.getByRole("button", { name })).not.toHaveClass("hidden");
+    }
+  });
 });

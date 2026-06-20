@@ -19,6 +19,13 @@ import { cn } from "../../../lib/cn.ts";
 // (notifications, help, settings, profile) plus the "Ask Rovo" AI entry point.
 // In change 0004 the controls are visual only — search, Create, and Ask Rovo are
 // wired to behaviour in later changes.
+//
+// Responsive degradation (so the bar never forces horizontal overflow below
+// 1024px): the header clips overflow and its clusters shrink gracefully —
+// primary nav is hidden below md, search below sm, and the secondary right
+// icons (help, settings) and the wordmark caption below lg. The primary
+// affordances (wordmark mark, Create, the Ask Rovo AI entry, notifications,
+// profile) stay reachable at every breakpoint.
 
 // Primary nav items rendered as a row of ghost buttons. `active` highlights the
 // current section the way Jira underlines the open area.
@@ -37,7 +44,9 @@ export function TopNav({ className }: TopNavProps) {
   return (
     <header
       className={cn(
-        "flex h-12 shrink-0 items-center gap-2 border-b bg-background px-3",
+        // overflow-hidden clips any momentary cluster overflow so it never
+        // becomes document-level horizontal scroll.
+        "flex h-12 shrink-0 items-center gap-2 overflow-hidden border-b bg-background px-3",
         className,
       )}
       // Landmark + label so the chrome is navigable and assertable by role.
@@ -47,17 +56,19 @@ export function TopNav({ className }: TopNavProps) {
       <Button
         variant="ghost"
         size="icon"
-        className="h-8 w-8 text-muted-foreground"
+        className="h-8 w-8 shrink-0 text-muted-foreground"
         aria-label="App switcher"
       >
         <Grid3x3 className="h-5 w-5" aria-hidden="true" />
       </Button>
 
       {/* Product wordmark — a client-side Link so navigating home stays in the
-          SPA and does not remount/reset the in-memory demo store. */}
+          SPA and does not remount/reset the in-memory demo store. The mark stays
+          at every breakpoint; the "Slop Jira" caption hides below lg so the bar
+          stays overflow-safe on narrow screens. */}
       <Link
         to="/demo"
-        className="mr-2 flex items-center gap-1.5 text-sm font-semibold text-foreground"
+        className="mr-2 flex shrink-0 items-center gap-1.5 text-sm font-semibold text-foreground"
       >
         <span
           className="flex h-6 w-6 items-center justify-center rounded-sm bg-primary text-[11px] font-bold text-primary-foreground"
@@ -65,7 +76,7 @@ export function TopNav({ className }: TopNavProps) {
         >
           S
         </span>
-        Slop Jira
+        <span className="hidden lg:inline">Slop Jira</span>
       </Link>
 
       {/* Primary nav */}
@@ -89,8 +100,8 @@ export function TopNav({ className }: TopNavProps) {
         ))}
       </nav>
 
-      {/* Create button */}
-      <Button size="sm" className="ml-1 h-8 font-medium">
+      {/* Create button — stays at every breakpoint (a primary affordance). */}
+      <Button size="sm" className="ml-1 h-8 shrink-0 font-medium">
         <Plus className="h-4 w-4" aria-hidden="true" />
         Create
       </Button>
@@ -109,8 +120,9 @@ export function TopNav({ className }: TopNavProps) {
         />
       </div>
 
-      {/* Right cluster */}
-      <div className="ml-auto flex items-center gap-1">
+      {/* Right cluster — shrink-0 so its icon buttons keep their hit targets;
+          Help/Settings drop below lg to stay overflow-safe on narrow widths. */}
+      <div className="ml-auto flex shrink-0 items-center gap-1">
         {/* Ask Rovo AI entry point */}
         <Button
           variant="outline"
@@ -138,10 +150,11 @@ export function TopNav({ className }: TopNavProps) {
           </span>
         </Button>
 
+        {/* Secondary icons — hidden below lg so the bar never overflows. */}
         <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8 text-muted-foreground"
+          className="hidden h-8 w-8 text-muted-foreground lg:inline-flex"
           aria-label="Help"
         >
           <CircleHelp className="h-5 w-5" aria-hidden="true" />
@@ -150,7 +163,7 @@ export function TopNav({ className }: TopNavProps) {
         <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8 text-muted-foreground"
+          className="hidden h-8 w-8 text-muted-foreground lg:inline-flex"
           aria-label="Settings"
         >
           <Settings className="h-5 w-5" aria-hidden="true" />

@@ -86,4 +86,35 @@ describe("Sidebar", () => {
       "custom-rail",
     );
   });
+
+  // Responsive auto-collapse: the expanded sidebar must be rail-width (w-14)
+  // below lg and only full-width (lg:w-60) at lg+, so it never forces horizontal
+  // overflow on narrow viewports. The store toggle still governs the lg+ width.
+  it("uses a rail width below lg and full width only at lg+ when expanded", () => {
+    render(<Sidebar />);
+    const nav = screen.getByRole("navigation", { name: "Project" });
+    expect(nav).toHaveClass("w-14");
+    expect(nav).toHaveClass("lg:w-60");
+  });
+
+  it("stays rail-width with no lg:w-60 when collapsed", () => {
+    useDemoStore.getState().setSidebarCollapsed(true);
+    render(<Sidebar />);
+    const nav = screen.getByRole("navigation", { name: "Project" });
+    expect(nav).toHaveClass("w-14");
+    expect(nav.className).not.toContain("lg:w-60");
+  });
+
+  it("hides the project name and item labels below lg when expanded (rail-safe)", () => {
+    render(<Sidebar />);
+    // Project name wrapper is hidden below lg.
+    const projectName = screen.getByText("Slop Simulator").parentElement;
+    expect(projectName).toHaveClass("hidden");
+    expect(projectName).toHaveClass("lg:flex");
+    // View-item labels and the Collapse caption only show at lg+.
+    const boardLabel = screen.getByText("Board");
+    expect(boardLabel).toHaveClass("hidden");
+    expect(boardLabel).toHaveClass("lg:inline");
+    expect(screen.getByText("Collapse")).toHaveClass("lg:inline");
+  });
 });

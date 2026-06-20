@@ -9,14 +9,21 @@ import { TopNav } from "./TopNav.tsx";
 // primitive resolves the Jira (light) token set. The main area renders a
 // placeholder board container; the real Kanban board arrives in change 0005, so
 // the shell is independently shippable.
+//
+// The root is w-full + overflow-x-hidden and the body row carries min-w-0 so the
+// chrome never produces document-level horizontal overflow at any breakpoint;
+// the sidebar auto-collapses and the top nav degrades responsively below lg.
 
 export function AppShell() {
   const project = useDemoStore((state) => state.project);
 
   return (
-    <ThemeScope theme="jira" className="flex h-dvh flex-col">
+    <ThemeScope
+      theme="jira"
+      className="flex h-dvh w-full flex-col overflow-x-hidden"
+    >
       <TopNav />
-      <div className="flex min-h-0 flex-1">
+      <div className="flex min-h-0 min-w-0 flex-1">
         <Sidebar />
         <main aria-label="Board" className="min-w-0 flex-1 overflow-auto p-4">
           {/* Board header — the view title + context bar above the columns. */}

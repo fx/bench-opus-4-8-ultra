@@ -46,4 +46,11 @@ describe("AppShell", () => {
     expect(screen.getByTestId("board-placeholder")).toBeInTheDocument();
     expect(screen.getByText("The board lands here.")).toBeInTheDocument();
   });
+
+  it("clips horizontal overflow at the shell root so the document never scrolls sideways", () => {
+    const { container } = renderShell();
+    const root = container.querySelector('[data-theme="jira"]');
+    expect(root).toHaveClass("overflow-x-hidden");
+    expect(root).toHaveClass("w-full");
+  });
 });

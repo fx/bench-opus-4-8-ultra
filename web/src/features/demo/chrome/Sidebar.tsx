@@ -26,6 +26,15 @@ import { useDemoStore } from "../store/store.ts";
 // Timeline, Backlog, Board (active), Calendar, Reports, Issues — plus the parody
 // "Rovo Agents" roster item. The collapse control folds it to an icon rail; the
 // collapsed flag lives in the store so the main content can reflow alongside.
+//
+// Responsive width: the full 240px (w-60) expanded width is only used at lg+.
+// Below lg the rail width (w-14) is forced regardless of the store's collapsed
+// flag — like real Jira, the sidebar auto-collapses to an icon rail on narrow
+// screens so it never pushes the board past the viewport (no horizontal
+// overflow at 320/375/768). The store-driven toggle still governs the lg+
+// width exactly as before. The expanded-only content (project name, item
+// labels, the "Collapse" caption) is therefore shown only when expanded AND
+// lg+; below lg it is hidden so it cannot overflow the 56px rail.
 
 type IconType = ComponentType<{ className?: string }>;
 
@@ -65,7 +74,10 @@ export function Sidebar({ className }: SidebarProps) {
         data-collapsed={collapsed}
         className={cn(
           "flex shrink-0 flex-col border-r bg-background transition-[width] duration-200",
-          collapsed ? "w-14" : "w-60",
+          // Rail width below lg in every case; full width only when expanded at
+          // lg+. This auto-collapses the sidebar on narrow viewports so it never
+          // forces horizontal overflow.
+          collapsed ? "w-14" : "w-14 lg:w-60",
           className,
         )}
       >
@@ -73,7 +85,10 @@ export function Sidebar({ className }: SidebarProps) {
         <div
           className={cn(
             "flex items-center gap-2 border-b px-3 py-3",
-            collapsed && "justify-center px-0",
+            // Centre the avatar in the rail; only spread out when expanded at lg+.
+            collapsed
+              ? "justify-center px-0"
+              : "justify-center lg:justify-start lg:px-3",
           )}
         >
           <span
@@ -84,7 +99,9 @@ export function Sidebar({ className }: SidebarProps) {
             {project.key.slice(0, 2)}
           </span>
           {!collapsed && (
-            <span className="flex flex-col overflow-hidden">
+            // Project name/key — only visible when expanded at lg+; hidden on the
+            // narrow rail so it cannot overflow.
+            <span className="hidden flex-col overflow-hidden lg:flex">
               <span className="truncate text-sm font-semibold text-foreground">
                 {project.name}
               </span>
@@ -108,14 +125,23 @@ export function Sidebar({ className }: SidebarProps) {
                 aria-label={view.label}
                 aria-current={view.active ? "page" : undefined}
                 className={cn(
-                  "flex w-full items-center gap-2.5 rounded-sm px-2 py-1.5 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground",
-                  collapsed && "justify-center px-0",
+                  "flex w-full items-center gap-2.5 rounded-sm py-1.5 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+                  // Rail layout (centred, no h-padding) when collapsed, or when
+                  // expanded below lg; full layout only when expanded at lg+.
+                  collapsed
+                    ? "justify-center px-0"
+                    : "justify-center px-0 lg:justify-start lg:px-2",
                   view.active && "bg-accent font-medium text-accent-foreground",
                   view.agent && "text-primary",
                 )}
               >
                 <Icon className="h-4 w-4 shrink-0" />
-                {!collapsed && <span className="truncate">{view.label}</span>}
+                {!collapsed && (
+                  // Label only when expanded at lg+; hidden on the narrow rail.
+                  <span className="hidden truncate lg:inline">
+                    {view.label}
+                  </span>
+                )}
               </button>
             );
 
@@ -144,8 +170,12 @@ export function Sidebar({ className }: SidebarProps) {
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             aria-expanded={!collapsed}
             className={cn(
-              "h-8 w-full justify-start gap-2 text-muted-foreground",
-              collapsed && "justify-center px-0",
+              "h-8 w-full gap-2 text-muted-foreground",
+              // Centre in the rail (collapsed, or expanded below lg); only spread
+              // out with the caption when expanded at lg+.
+              collapsed
+                ? "justify-center px-0"
+                : "justify-center px-0 lg:justify-start lg:px-3",
             )}
           >
             {collapsed ? (
@@ -153,7 +183,7 @@ export function Sidebar({ className }: SidebarProps) {
             ) : (
               <ChevronLeft className="h-4 w-4" aria-hidden="true" />
             )}
-            {!collapsed && <span>Collapse</span>}
+            {!collapsed && <span className="hidden lg:inline">Collapse</span>}
           </Button>
         </div>
       </nav>
