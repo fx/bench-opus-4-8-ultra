@@ -67,5 +67,5 @@ changes:
     path: changes/0007-demo-agent-features.md
     description: Simulated streaming agent, Agentic Autopilot, Ask Rovo, AI-generate fields, and agent roster.
     spec: demo-jira-clone
-    status: draft
+    status: complete
     depends_on: ["0005", "0006"]

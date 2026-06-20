@@ -19,7 +19,7 @@ import {
   TooltipTrigger,
 } from "../../../components/ui/tooltip.tsx";
 import { cn } from "../../../lib/cn.ts";
-import { useDemoStore } from "../store/store.ts";
+import { useDemoStore, type DemoView } from "../store/store.ts";
 
 // The collapsible left sidebar (see docs/specs/demo-jira-clone › App Chrome). It
 // shows the current SLOP project context and the Jira view list — Summary,
@@ -41,21 +41,24 @@ type IconType = ComponentType<{ className?: string }>;
 interface ViewItem {
   label: string;
   icon: IconType;
-  active?: boolean;
   agent?: boolean;
+  // The store view this item navigates to (0007). Only "Board" and "Rovo Agents"
+  // are real destinations; the rest stay visual placeholders (no `view`).
+  view?: DemoView;
 }
 
-// The sidebar view list. "Board" is the default/active view; "Rovo Agents" is
-// the parody roster entry, visually distinguished as an AI surface.
+// The sidebar view list. "Board" is the default view; "Rovo Agents" is the
+// parody roster entry, visually distinguished as an AI surface. Both navigate via
+// the store's `activeView`; the others remain non-navigating placeholders.
 const VIEWS: ViewItem[] = [
   { label: "Summary", icon: FileText },
   { label: "Timeline", icon: Clock },
   { label: "Backlog", icon: List },
-  { label: "Board", icon: Columns3, active: true },
+  { label: "Board", icon: Columns3, view: "board" },
   { label: "Calendar", icon: Calendar },
   { label: "Reports", icon: ChartNoAxesColumn },
   { label: "Issues", icon: PanelLeft },
-  { label: "Rovo Agents", icon: Bot, agent: true },
+  { label: "Rovo Agents", icon: Bot, agent: true, view: "agents" },
 ];
 
 export interface SidebarProps {
@@ -66,6 +69,8 @@ export function Sidebar({ className }: SidebarProps) {
   const collapsed = useDemoStore((state) => state.sidebarCollapsed);
   const toggleSidebar = useDemoStore((state) => state.toggleSidebar);
   const project = useDemoStore((state) => state.project);
+  const activeView = useDemoStore((state) => state.activeView);
+  const setView = useDemoStore((state) => state.setView);
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -119,11 +124,18 @@ export function Sidebar({ className }: SidebarProps) {
         <ul className="flex flex-1 flex-col gap-0.5 overflow-y-auto p-2">
           {VIEWS.map((view) => {
             const Icon = view.icon;
+            // A navigable item (Board / Rovo Agents) is "active" when its view is
+            // the store's current view; placeholder items are never active.
+            const isActive =
+              view.view !== undefined && view.view === activeView;
             const button = (
               <button
                 type="button"
                 aria-label={view.label}
-                aria-current={view.active ? "page" : undefined}
+                aria-current={isActive ? "page" : undefined}
+                onClick={
+                  view.view ? () => setView(view.view as DemoView) : undefined
+                }
                 className={cn(
                   "flex w-full items-center gap-2.5 rounded-sm py-1.5 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground",
                   // Rail layout (centred, no h-padding) when collapsed, or when
@@ -131,7 +143,7 @@ export function Sidebar({ className }: SidebarProps) {
                   collapsed
                     ? "justify-center px-0"
                     : "justify-center px-0 lg:justify-start lg:px-2",
-                  view.active && "bg-accent font-medium text-accent-foreground",
+                  isActive && "bg-accent font-medium text-accent-foreground",
                   view.agent && "text-primary",
                 )}
               >

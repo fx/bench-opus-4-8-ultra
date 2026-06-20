@@ -106,7 +106,7 @@ describe("DescriptionField", () => {
     expect(screen.getByTestId("description-textarea")).toBeInTheDocument();
   });
 
-  it("renders the aiSlot beside the heading", () => {
+  it("renders the aiSlot beside the heading in read mode", () => {
     render(
       <DescriptionField
         description="x"
@@ -114,6 +114,26 @@ describe("DescriptionField", () => {
         aiSlot={<button>AI</button>}
       />,
     );
+    expect(screen.getByRole("button", { name: "AI" })).toBeInTheDocument();
+  });
+
+  it("hides the aiSlot while the inline editor is open (no stale-draft clobber)", async () => {
+    const user = userEvent.setup();
+    render(
+      <DescriptionField
+        description="x"
+        onSave={() => {}}
+        aiSlot={<button>AI</button>}
+      />,
+    );
+    // Enter edit mode → the AI-generate action is removed so generating can't be
+    // clobbered by the textarea's stale draft on Save.
+    await user.click(screen.getByTestId("description-display"));
+    expect(
+      screen.queryByRole("button", { name: "AI" }),
+    ).not.toBeInTheDocument();
+    // Leaving edit mode restores it.
+    await user.keyboard("{Escape}");
     expect(screen.getByRole("button", { name: "AI" })).toBeInTheDocument();
   });
 

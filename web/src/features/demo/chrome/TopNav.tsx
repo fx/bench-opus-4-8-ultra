@@ -5,20 +5,20 @@ import {
   Plus,
   Search,
   Settings,
-  Sparkles,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Avatar, AvatarFallback } from "../../../components/ui/avatar.tsx";
 import { Button } from "../../../components/ui/button.tsx";
 import { Input } from "../../../components/ui/input.tsx";
 import { cn } from "../../../lib/cn.ts";
+import { CommandBar } from "../rovo/CommandBar.tsx";
 
 // The fixed Jira-look top navigation bar (see docs/specs/demo-jira-clone › App
 // Chrome). Left→right: app-switcher (9-dot), wordmark, primary nav items, the
 // blue Create button, a search/command input, and a right cluster
 // (notifications, help, settings, profile) plus the "Ask Rovo" AI entry point.
-// In change 0004 the controls are visual only — search, Create, and Ask Rovo are
-// wired to behaviour in later changes.
+// "Ask Rovo" is the live CommandBar (0007 — opens the scripted-answer dialog);
+// search, Create, and the secondary icons remain visual placeholders.
 //
 // Responsive degradation (so the bar never forces horizontal overflow below
 // 1024px): the header clips overflow and its clusters shrink gracefully —
@@ -123,16 +123,8 @@ export function TopNav({ className }: TopNavProps) {
       {/* Right cluster — shrink-0 so its icon buttons keep their hit targets;
           Help/Settings drop below lg to stay overflow-safe on narrow widths. */}
       <div className="ml-auto flex shrink-0 items-center gap-1">
-        {/* Ask Rovo AI entry point */}
-        <Button
-          variant="outline"
-          size="sm"
-          className="h-8 gap-1.5 border-primary/30 font-medium text-primary"
-          aria-label="Ask Rovo"
-        >
-          <Sparkles className="h-4 w-4" aria-hidden="true" />
-          <span className="hidden lg:inline">Ask Rovo</span>
-        </Button>
+        {/* Ask Rovo command bar (0007) — opens the scripted-answer dialog. */}
+        <CommandBar />
 
         {/* Notifications with unread badge */}
         <Button

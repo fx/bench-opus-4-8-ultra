@@ -24,11 +24,11 @@ import { StatusDropdown } from "./StatusDropdown.tsx";
 // through the store (the SAME transition the board's drag uses), so the board
 // stays in sync; closing returns to the board.
 //
-// 0007 slots (exposed, NOT implemented here):
-//  - aiAgentSlot   — the right-hand streaming agent panel, rendered below Details.
+// 0007 slots (exposed; wired by the AppShell):
+//  - aiAgentSlot      — the right-hand streaming agent panel, rendered below Details.
+//  - summaryAiSlot    — the "✨ AI-generate summary" action, beside the title.
 //  - descriptionAiSlot / replyAiSlot — the "AI-generate" sparkle buttons.
-// The slot props default to undefined so the detail renders cleanly today and the
-// agent change plugs in without restructuring.
+// The slot props default to undefined so the detail renders cleanly without them.
 
 export interface IssueDetailProps {
   // Current time (epoch ms) for relative timestamps. Defaults to Date.now(); a
@@ -40,8 +40,9 @@ export interface IssueDetailProps {
   // minutes after the modal opened reads "just now", not "N minutes ago". A test
   // injects a fixed clock to make the recorded timestamps deterministic.
   clock?: () => number;
-  // 0007 slots — see file header. Optional render slots, omitted today.
+  // 0007 slots — see file header. Optional render slots, omitted by default.
   aiAgentSlot?: (issue: Issue) => ReactNode;
+  summaryAiSlot?: (issue: Issue) => ReactNode;
   descriptionAiSlot?: (issue: Issue) => ReactNode;
   replyAiSlot?: (issue: Issue) => ReactNode;
 }
@@ -55,6 +56,7 @@ function IssueDetailContent({
   clock,
   onDescriptionEditingChange,
   aiAgentSlot,
+  summaryAiSlot,
   descriptionAiSlot,
   replyAiSlot,
 }: {
@@ -63,6 +65,7 @@ function IssueDetailContent({
   clock: () => number;
   onDescriptionEditingChange: (editing: boolean) => void;
   aiAgentSlot?: (issue: Issue) => ReactNode;
+  summaryAiSlot?: (issue: Issue) => ReactNode;
   descriptionAiSlot?: (issue: Issue) => ReactNode;
   replyAiSlot?: (issue: Issue) => ReactNode;
 }) {
@@ -92,9 +95,14 @@ function IssueDetailContent({
         <div className="grid gap-6 p-1 pt-4 md:grid-cols-[minmax(0,1fr)_18rem]">
           {/* LEFT content column. */}
           <div className="flex min-w-0 flex-col gap-6">
-            <DialogTitle className="text-xl font-semibold text-foreground">
-              {issue.summary}
-            </DialogTitle>
+            <div className="flex items-start justify-between gap-2">
+              <DialogTitle className="text-xl font-semibold text-foreground">
+                {issue.summary}
+              </DialogTitle>
+              {summaryAiSlot && (
+                <div className="shrink-0">{summaryAiSlot(issue)}</div>
+              )}
+            </div>
             {/* A visually-hidden description satisfies Radix's a11y
                 requirement that a Dialog be described; it names the issue. */}
             <DialogDescription className="sr-only">
@@ -137,6 +145,7 @@ export function IssueDetail({
   now = Date.now(),
   clock = Date.now,
   aiAgentSlot,
+  summaryAiSlot,
   descriptionAiSlot,
   replyAiSlot,
 }: IssueDetailProps) {
@@ -217,6 +226,7 @@ export function IssueDetail({
             clock={clock}
             onDescriptionEditingChange={setEditingDescription}
             aiAgentSlot={aiAgentSlot}
+            summaryAiSlot={summaryAiSlot}
             descriptionAiSlot={descriptionAiSlot}
             replyAiSlot={replyAiSlot}
           />

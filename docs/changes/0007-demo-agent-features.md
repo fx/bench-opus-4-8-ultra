@@ -5,7 +5,7 @@
 Implement the demo's core parody: the "✨ Implement now with AI" simulated streaming agent that "ships" tickets, plus the supporting AI gags — Agentic Autopilot, Ask Rovo command bar, AI-generate field buttons, the Rovo Agents roster, and agent activity/comments.
 
 **Spec:** [Demo Jira Clone](../specs/demo-jira-clone/)
-**Status:** draft
+**Status:** complete
 **Depends On:** 0005, 0006
 
 ## Motivation
@@ -93,17 +93,19 @@ The demo MUST also provide: an **Agentic Autopilot** board toggle that autonomou
 
 ## Tasks
 
-- [ ] Agent engine — deterministic step scripts + injectable clock, `start`/`tick`/`cancel`, progress/terminal events; tests (streaming order, completion, cancellation) with fake timers
-- [ ] Agent panel + card/detail wiring — `AgentPanel` (caret, step states, log), "Implement now with AI" on card + detail, completion side-effects (Done + agent-handled + activity); tests
-- [ ] Autopilot + Ask Rovo — board Autopilot toggle (timed autonomy via clock), Ask Rovo command bar (scripted answers); tests (toggle on/off halts, query→answer) with fake timers
-- [ ] Rovo Agents roster + AI-generate fields — roster page (absurd agents + stats, Hire/Assign), AI-generate summary/description buttons; tests
-- [ ] Update `README.md` to describe the full agentic demo feature set
+- [x] Agent engine — deterministic step scripts + injectable clock, `start`/`tick`/`cancel`, progress/terminal events; tests (streaming order, completion, cancellation) with fake timers
+- [x] Agent panel + card/detail wiring — `AgentPanel` (caret, step states, log), "Implement now with AI" on card + detail, completion side-effects (Done + agent-handled + activity); tests
+- [x] Autopilot + Ask Rovo — board Autopilot toggle (timed autonomy via clock), Ask Rovo command bar (scripted answers); tests (toggle on/off halts, query→answer) with fake timers
+- [x] Rovo Agents roster + AI-generate fields — roster page (absurd agents + stats, Hire/Assign), AI-generate summary/description buttons; tests
+- [x] Update `README.md` to describe the full agentic demo feature set
 
 ## Open Questions
 
-- [ ] Streaming chunk size / per-step durations for the most convincing feel — tune during implementation (default word-chunked).
-- [ ] Autopilot pacing (fixed vs jittered) — default jittered, seeded for test determinism.
-- [ ] Whether AI-generate buttons also exist in the Create modal — default: include if Create modal is built; otherwise issue-detail only.
+All resolved during implementation:
+
+- [x] Streaming chunk size / per-step durations — RESOLVED: word-chunked streaming (each step's output revealed word-by-word over its `durationMs`), with per-step durations tuned in `agent-script.ts` (~1.8–3.6s) for a convincing-yet-fast feel.
+- [x] Autopilot pacing (fixed vs jittered) — RESOLVED: jittered, seeded by the move ordinal (`jitteredInterval`/`seededJitter` in `autopilot.ts`) so it feels organic yet is deterministic under fast-forwarded fake timers.
+- [x] AI-generate buttons in the Create modal — RESOLVED: no Create modal was built in this project, so the AI-generate (summary/description) and "Reply with AI" affordances live in the issue detail only.
 
 ## References
 
