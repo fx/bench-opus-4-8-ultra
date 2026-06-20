@@ -89,4 +89,19 @@ describe("Nav", () => {
       screen.getByRole("heading", { name: "Demo Destination" }),
     ).toBeInTheDocument();
   });
+
+  it("uses comfortable ≥44px mobile tap targets", async () => {
+    const user = userEvent.setup();
+    renderNav();
+    // The menu trigger is a 44x44 hit area (h-11 w-11).
+    const trigger = screen.getByRole("button", { name: "Open menu" });
+    expect(trigger).toHaveClass("h-11", "w-11");
+    await user.click(trigger);
+    const menu = screen.getByTestId("mobile-menu");
+    // Every mobile menu anchor and the Log in / Demo CTAs carry the min-h-11
+    // tap-target floor.
+    for (const link of within(menu).getAllByRole("link")) {
+      expect(link).toHaveClass("min-h-11");
+    }
+  });
 });

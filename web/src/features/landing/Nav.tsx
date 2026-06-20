@@ -75,13 +75,13 @@ export function Nav() {
             <DemoButton size="sm" />
           </div>
 
-          {/* Mobile menu toggle */}
+          {/* Mobile menu toggle — 44px hit area for comfortable mobile tapping */}
           <button
             type="button"
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen((open) => !open)}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-md border text-foreground transition-colors hover:bg-accent hover:text-accent-foreground md:hidden"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-md border text-foreground transition-colors hover:bg-accent hover:text-accent-foreground md:hidden"
           >
             {menuOpen ? (
               <X className="h-5 w-5" />
@@ -105,18 +105,22 @@ export function Nav() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setMenuOpen(false)}
-                  className="rounded-md px-2 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                  // ≥44px tap target for mobile menu items.
+                  className="flex min-h-11 items-center rounded-md px-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
                 >
                   {link.label}
                 </a>
               ))}
               <div className="mt-3 flex flex-col gap-2">
-                <Button asChild variant="ghost">
+                <Button asChild variant="ghost" className="min-h-11">
                   <Link to="/demo" onClick={() => setMenuOpen(false)}>
                     Log in
                   </Link>
                 </Button>
-                <DemoButton onNavigate={() => setMenuOpen(false)} />
+                <DemoButton
+                  className="min-h-11"
+                  onNavigate={() => setMenuOpen(false)}
+                />
               </div>
             </div>
           </div>

@@ -57,4 +57,17 @@ describe("Button", () => {
     expect(buttonVariants({ size: "lg" })).toContain("h-10");
     expect(buttonVariants({ size: "icon" })).toContain("w-9");
   });
+
+  it("gives every button a pressed/active state", () => {
+    // The base classes dip the button 1px on pointerdown so it responds to
+    // presses; the default (primary) variant also darkens its fill while held.
+    const base = buttonVariants({});
+    expect(base).toContain("active:translate-y-px");
+    expect(buttonVariants({ variant: "default" })).toContain(
+      "active:bg-primary-hover",
+    );
+    expect(buttonVariants({ variant: "outline" })).toContain(
+      "active:bg-accent/80",
+    );
+  });
 });

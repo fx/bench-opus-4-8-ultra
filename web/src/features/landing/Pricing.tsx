@@ -77,7 +77,7 @@ function TierCard({
 
       <Button
         asChild
-        className="mt-8 w-full"
+        className="mt-8 min-h-11 w-full"
         variant={tier.popular ? "default" : "outline"}
       >
         <Link to="/demo">{tier.cta}</Link>

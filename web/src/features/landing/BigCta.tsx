@@ -17,7 +17,7 @@ export function BigCta() {
             {BIG_CTA.headline}
           </h2>
           <div className="mt-8 flex justify-center">
-            <Button asChild size="lg">
+            <Button asChild size="lg" className="min-h-11">
               <Link to="/demo">{BIG_CTA.cta}</Link>
             </Button>
           </div>

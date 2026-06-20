@@ -32,14 +32,14 @@ export function Hero({ terminalClock }: HeroProps) {
             {HERO.subhead}
           </p>
           <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row lg:justify-start">
-            <Button asChild size="lg" className="w-full sm:w-auto">
+            <Button asChild size="lg" className="min-h-11 w-full sm:w-auto">
               <Link to="/demo">{HERO.primaryCta}</Link>
             </Button>
             <Button
               asChild
               size="lg"
               variant="outline"
-              className="w-full sm:w-auto"
+              className="min-h-11 w-full sm:w-auto"
             >
               <Link to="/demo">{HERO.secondaryCta}</Link>
             </Button>

@@ -23,12 +23,14 @@ export function Footer() {
             <p className="mt-4 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs text-slop">
               {FOOTER_STATUS}
             </p>
-            <div className="mt-5 flex gap-3">
+            <div className="mt-4 flex flex-wrap gap-1">
               {FOOTER_SOCIALS.map((social) => (
                 <Link
                   key={social}
                   to="/demo"
-                  className="text-xs text-muted-foreground transition-colors hover:text-foreground"
+                  // Larger tap target: a padded inline-flex with a comfortable
+                  // min hit area instead of bare text.
+                  className="inline-flex min-h-11 items-center px-2 text-xs text-muted-foreground transition-colors hover:text-foreground"
                 >
                   {social}
                 </Link>
@@ -41,12 +43,15 @@ export function Footer() {
               <h3 className="text-sm font-semibold text-foreground">
                 {column.heading}
               </h3>
-              <ul className="mt-4 space-y-2.5">
+              <ul className="mt-2">
                 {column.links.map((link) => (
                   <li key={link}>
                     <Link
                       to="/demo"
-                      className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                      // Each link is a block with vertical padding so the tap
+                      // target is comfortably tall (≈40px) without an oversized
+                      // gap between rows.
+                      className="flex min-h-10 items-center text-sm text-muted-foreground transition-colors hover:text-foreground"
                     >
                       {link}
                     </Link>

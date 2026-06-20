@@ -14,11 +14,15 @@
   --card: 0 0% 11%; /* #1C1C1C raised */
   --foreground: 0 0% 96%;
   --muted-foreground: 0 0% 64%;
-  --primary: 252 100% 68%; /* violet #7C5CFF */
+  /* Violet tuned for WCAG AA: white text on --primary must be ≥4.5:1 for normal
+     text. L68 (the old value) was only 4.35:1 and the old hover LIGHTENED to
+     3.23:1 — both failing. L64 = rgb(108,71,255) = 5.27:1 at rest, and the hover
+     DARKENS to L58 = rgb(84,41,255) = 6.69:1, so both states pass with margin. */
+  --primary: 252 100% 64%; /* violet #6C47FF — 5.27:1 on #fff */
   --primary-foreground: 0 0% 100%;
-  --primary-hover: 252 100% 74%;
+  --primary-hover: 252 100% 58%; /* darker on hover — 6.69:1 on #fff */
   --slop: 84 100% 62%; /* chartreuse #B6FF3C secondary */
-  --accent: 252 100% 68%;
+  --accent: 252 100% 64%;
   --accent-foreground: 0 0% 100%;
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
