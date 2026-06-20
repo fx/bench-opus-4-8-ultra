@@ -15,9 +15,10 @@ import { buildAgentScript } from "./agent-script.ts";
 // streaming once all prior steps' durations have elapsed — so the panel shows
 // running → done in sequence.
 
-// RunStatus is the lifecycle of a single agent run. `idle` never appears in a
-// live run object (a run is created already `running`); it exists in the union
-// for the store's "no run" sentinel symmetry and the AgentRun data model.
+// RunStatus is the lifecycle of a SINGLE live agent run: a run is created already
+// `running` and ends either `done` (completed) or `cancelled`. There is no `idle`
+// status — "no run in flight" is represented by the store holding `agentRun: null`,
+// not by an idle run object.
 export type RunStatus = "running" | "done" | "cancelled";
 
 // A per-step view the panel renders: the script step plus its derived live
