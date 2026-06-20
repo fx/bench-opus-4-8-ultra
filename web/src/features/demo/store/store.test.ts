@@ -1,5 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
+  applyMoveIssue,
+  columnsFromIssues,
   selectAgentUser,
   selectColumns,
   selectIssueByKey,
@@ -117,6 +119,89 @@ describe("setIssueStatus", () => {
   });
 });
 
+describe("applyMoveIssue (pure board-transition reducer)", () => {
+  it("returns a new issues slice with the transitioned status + bumped clock", () => {
+    const state = useDemoStore.getState();
+    const todo = selectIssuesByStatus(state, "todo")[0];
+    const result = applyMoveIssue(state, todo.key, "in_progress", () => 999);
+
+    // A move yields a partial slice (not the same state reference).
+    expect(result).not.toBe(state);
+    const issues = (result as { issues: typeof state.issues }).issues;
+    expect(issues).not.toBe(state.issues);
+    const moved = issues.find((i) => i.key === todo.key);
+    expect(moved?.status).toBe("in_progress");
+    expect(moved?.updatedAt).toBe(999);
+    // Other issues are preserved by identity (only the one was replaced).
+    const other = issues.find((i) => i.key !== todo.key);
+    const originalOther = state.issues.find((i) => i.key === other?.key);
+    expect(other).toBe(originalOther);
+  });
+
+  it("is a no-op (same state reference) for an unknown key", () => {
+    const state = useDemoStore.getState();
+    expect(applyMoveIssue(state, "SLOP-999", "done", () => 1)).toBe(state);
+  });
+
+  it("is a no-op (same state reference) when the issue is already in the target column", () => {
+    const state = useDemoStore.getState();
+    const todo = selectIssuesByStatus(state, "todo")[0];
+    expect(applyMoveIssue(state, todo.key, "todo", () => 1)).toBe(state);
+  });
+});
+
+describe("moveIssue store action", () => {
+  it("moves a To Do card to In Progress and updates both column counts live", () => {
+    const before = selectStatusCounts(useDemoStore.getState());
+    const todo = selectIssuesByStatus(useDemoStore.getState(), "todo")[0];
+
+    useDemoStore.getState().moveIssue(todo.key, "in_progress", () => 42);
+
+    const after = selectStatusCounts(useDemoStore.getState());
+    expect(after.todo).toBe(before.todo - 1);
+    expect(after.in_progress).toBe(before.in_progress + 1);
+    const moved = selectIssueByKey(useDemoStore.getState(), todo.key);
+    expect(moved?.status).toBe("in_progress");
+    expect(moved?.updatedAt).toBe(42);
+  });
+
+  it("defaults to Date.now when no clock is injected", () => {
+    const todo = selectIssuesByStatus(useDemoStore.getState(), "todo")[0];
+    const before = Date.now();
+    useDemoStore.getState().moveIssue(todo.key, "done");
+    const after = Date.now();
+    const moved = selectIssueByKey(useDemoStore.getState(), todo.key);
+    expect(moved?.status).toBe("done");
+    expect(moved?.updatedAt).toBeGreaterThanOrEqual(before);
+    expect(moved?.updatedAt).toBeLessThanOrEqual(after);
+  });
+
+  it("is a no-op for a same-column drop: no array swap, no subscriber notify", () => {
+    const todo = selectIssuesByStatus(useDemoStore.getState(), "todo")[0];
+    const issuesBefore = useDemoStore.getState().issues;
+    const listener = vi.fn();
+    const unsubscribe = useDemoStore.subscribe(listener);
+
+    useDemoStore.getState().moveIssue(todo.key, "todo", () => 1);
+
+    expect(useDemoStore.getState().issues).toBe(issuesBefore);
+    expect(listener).not.toHaveBeenCalled();
+    unsubscribe();
+  });
+
+  it("is a no-op for an unknown key", () => {
+    const issuesBefore = useDemoStore.getState().issues;
+    const listener = vi.fn();
+    const unsubscribe = useDemoStore.subscribe(listener);
+
+    useDemoStore.getState().moveIssue("SLOP-000", "done", () => 1);
+
+    expect(useDemoStore.getState().issues).toBe(issuesBefore);
+    expect(listener).not.toHaveBeenCalled();
+    unsubscribe();
+  });
+});
+
 describe("reset", () => {
   it("restores the seed exactly after mutations", () => {
     const target = useDemoStore.getState().issues[0];
@@ -197,5 +282,15 @@ describe("selectors", () => {
     }
     const total = columns.reduce((sum, c) => sum + c.issues.length, 0);
     expect(total).toBe(state.issues.length);
+  });
+
+  it("columnsFromIssues derives the ordered columns from a bare issues array", () => {
+    const { issues } = useDemoStore.getState();
+    const columns = columnsFromIssues(issues);
+    expect(columns.map((c) => c.status)).toEqual([...STATUS_ORDER]);
+    const total = columns.reduce((sum, c) => sum + c.issues.length, 0);
+    expect(total).toBe(issues.length);
+    // selectColumns delegates to columnsFromIssues → identical shape.
+    expect(columns).toEqual(selectColumns(useDemoStore.getState()));
   });
 });

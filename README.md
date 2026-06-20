@@ -10,14 +10,14 @@
 Everything is fictional parody — but every interaction is built to feel completely real: real timing, real streaming output, real-looking UI.
 
 > **Status:** Scaffold + design system landed, the **landing page (`/`) ships in
-> full**, and the **demo app shell (`/demo`) is in place**. A single Go server
-> serves a Bun/Vite/React SPA with end-to-end hot reload in dev and embedded
-> assets in prod, behind a 100%-coverage CI gate. The `/demo` route now renders
-> the Jira-look-alike shell (chrome, store, seed; see *What exists now*); the
-> remaining demo features (board, issue detail, agents) are still **planned**.
-> See [`docs/`](docs/) for the living specifications and change documents that
-> drive implementation. As features ship, this README is updated to describe
-> what actually exists.
+> full**, and the **demo app shell plus its Kanban board (`/demo`) are in
+> place**. A single Go server serves a Bun/Vite/React SPA with end-to-end hot
+> reload in dev and embedded assets in prod, behind a 100%-coverage CI gate. The
+> `/demo` route now renders the Jira-look-alike shell (chrome, store, seed) with
+> a working **drag-and-drop Kanban board** (see *What exists now*); the remaining
+> demo features (issue detail, agents) are still **planned**. See [`docs/`](docs/)
+> for the living specifications and change documents that drive implementation. As
+> features ship, this README is updated to describe what actually exists.
 
 ---
 
@@ -74,9 +74,24 @@ Everything is fictional parody — but every interaction is built to feel comple
   `lg`). Demo state lives in a client-side **Zustand store** seeded from a
   deterministic mock dataset (the `SLOP` project, parody users including the
   "Rovo Ultra" agent, and 14 parody issues across all four columns), with
-  selectors and a `reset()` that restores the seed exactly. The main area shows a
-  placeholder board container; the real Kanban board, issue detail, and agent
-  features are still **planned** (see below).
+  selectors and a `reset()` that restores the seed exactly. Issue detail and
+  agent features are still **planned** (see below).
+
+- The **demo Kanban board** under
+  [`web/src/features/demo/board`](web/src/features/demo/board): the main content
+  area renders the four ordered columns (**To Do · In Progress · In Review ·
+  Done**), each with a name and a **live issue count** derived from store
+  selectors. Cards show the full Jira meta — an optional epic lozenge, the
+  summary, optional labels, then a footer with the coloured issue-type icon
+  (Story/Task/Bug/Epic/Sub-task), the `SLOP-###` key, a priority chevron, a
+  story-points badge and the assignee avatar (agent-handled work gets a violet
+  ring + "Rovo" marker). Cards are **draggable between columns** via
+  [`@dnd-kit/core`](https://dndkit.com) — including an accessible **keyboard
+  sensor** — and a drop dispatches a pure `moveIssue` store transition that
+  updates the issue's status and both affected column counts. The transition
+  logic lives in the store (unit-tested in isolation), separate from the dnd
+  wiring. Each card exposes slots for the later "Implement now with AI" action
+  (0007) and the issue-detail click (0006) without implementing them yet.
 
 ## Development
 
@@ -109,10 +124,9 @@ bun run test:web    # Vitest + 100% coverage thresholds
 ### The demo (`/demo`)
 
 A convincing Jira look-alike whose every feature is a joke (the chrome shell —
-top nav, collapsible sidebar, store, and seed — already exists; see *What exists
-now*; the items below remain planned):
+top nav, collapsible sidebar, store, and seed — and the **drag-and-drop Kanban
+board** already exist; see *What exists now*; the items below remain planned):
 
-- A **Kanban board** (To Do / In Progress / In Review / Done) with draggable, richly-detailed issue cards in place of the current placeholder board container
 - An **issue detail** view with status transitions, a details panel, and an activity feed
 - **"✨ Implement now with AI"** on every ticket — opens an agent panel that streams scripted, plausible implementation steps in real time and then "ships" the ticket
 - **Agentic Autopilot** — flip it on and watch tickets ship themselves

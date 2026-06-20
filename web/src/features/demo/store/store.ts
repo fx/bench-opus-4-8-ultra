@@ -31,9 +31,39 @@ export interface DemoState {
   // for unknown keys so callers never need to guard. `updatedAt` is bumped via
   // the injectable `now` so tests stay deterministic.
   setIssueStatus: (key: string, status: Status, now?: () => number) => void;
+  // Board drag-and-drop transition (0005). Semantically a status change, but
+  // separated from `setIssueStatus` so the board's dnd wiring has a named,
+  // intention-revealing action and the pure transition reducer
+  // (`applyMoveIssue`) can be unit-tested directly. Both a same-column drop and
+  // an unknown key are no-ops (the SAME state reference, so subscribers aren't
+  // notified and counts don't churn).
+  moveIssue: (key: string, status: Status, now?: () => number) => void;
   // Restore the canonical seed, discarding all mutations. Sidebar collapse is
   // reset too so the demo returns to a pristine initial state.
   reset: () => void;
+}
+
+// applyMoveIssue is the PURE board-transition reducer, kept out of the store
+// closure (and out of the dnd handler) so it is unit-testable in isolation per
+// the change-0005 design ("transition logic in the store, not the dnd handler").
+// It returns a partial state slice to merge, or the SAME `state` reference for a
+// no-op so Zustand bails out without notifying subscribers. A move is a no-op
+// when the key is unknown OR the issue is already in the target column — both
+// must avoid churning the issues array (and therefore the live column counts).
+export function applyMoveIssue(
+  state: DemoState,
+  key: string,
+  status: Status,
+  now: () => number,
+): DemoState | Pick<DemoState, "issues"> {
+  const index = state.issues.findIndex((issue) => issue.key === key);
+  // Unknown key, or already in the target column → no-op (same reference).
+  if (index === -1 || state.issues[index].status === status) {
+    return state;
+  }
+  const issues = state.issues.slice();
+  issues[index] = { ...issues[index], status, updatedAt: now() };
+  return { issues };
 }
 
 export const useDemoStore = create<DemoState>((set) => ({
@@ -58,6 +88,9 @@ export const useDemoStore = create<DemoState>((set) => ({
       issues[index] = { ...issues[index], status, updatedAt: now() };
       return { issues };
     }),
+
+  moveIssue: (key, status, now = Date.now) =>
+    set((state) => applyMoveIssue(state, key, status, now)),
 
   reset: () => set({ ...createSeed(), sidebarCollapsed: false }),
 }));
@@ -112,13 +145,25 @@ export function selectTotalIssues(state: DemoState): number {
   return state.issues.length;
 }
 
-// The board columns in display order paired with their issues — a convenience
-// composing STATUS_ORDER with selectIssuesByStatus for the board/sidebar.
-export function selectColumns(
-  state: DemoState,
-): { status: Status; issues: Issue[] }[] {
+// A single board column: a status and the issues currently in it.
+export interface BoardColumn {
+  status: Status;
+  issues: Issue[];
+}
+
+// The board columns in display order, derived purely from an issues array. The
+// Board subscribes to `state.issues` (a stable reference) and memoises this, so
+// it never feeds a freshly-built object back into Zustand's equality check (which
+// would loop). Kept independent of DemoState so it composes from any issue list.
+export function columnsFromIssues(issues: Issue[]): BoardColumn[] {
   return STATUS_ORDER.map((status) => ({
     status,
-    issues: selectIssuesByStatus(state, status),
+    issues: issues.filter((issue) => issue.status === status),
   }));
+}
+
+// The board columns in display order paired with their issues — a convenience
+// composing STATUS_ORDER with the issue list for the board/sidebar.
+export function selectColumns(state: DemoState): BoardColumn[] {
+  return columnsFromIssues(state.issues);
 }

@@ -53,7 +53,7 @@ changes:
     path: changes/0005-demo-board.md
     description: Kanban board with columns, detailed issue cards, and drag-to-transition.
     spec: demo-jira-clone
-    status: draft
+    status: complete
     depends_on: ["0004"]
   - id: "0006"
     name: demo-issue-detail

@@ -5,7 +5,7 @@
 Implement the demo's primary view: a Jira-style Kanban board with four columns (To Do / In Progress / In Review / Done), richly-detailed draggable issue cards, live column counts, and status transitions on drop.
 
 **Spec:** [Demo Jira Clone](../specs/demo-jira-clone/)
-**Status:** draft
+**Status:** complete
 **Depends On:** 0004
 
 ## Motivation
@@ -80,15 +80,15 @@ Cards MUST be draggable between columns; a drop MUST update the issue status and
 
 ## Tasks
 
-- [ ] Board + columns — `Board`, `Column` with live counts; store `moveIssue` + selectors; tests (counts, move logic)
-- [ ] Issue card — `Card` with full meta + issue-type/priority icons, points, avatar, lozenges; tests (meta rendering per type/priority)
-- [ ] Drag-and-drop — `@dnd-kit` wiring, drop → `moveIssue`, count updates; tests (drop handler updates status/counts)
-- [ ] Update `README.md` to note the working demo board
+- [x] Board + columns — `Board`, `Column` with live counts; store `moveIssue` + selectors; tests (counts, move logic)
+- [x] Issue card — `Card` with full meta + issue-type/priority icons, points, avatar, lozenges; tests (meta rendering per type/priority)
+- [x] Drag-and-drop — `@dnd-kit` wiring, drop → `moveIssue`, count updates; tests (drop handler updates status/counts)
+- [x] Update `README.md` to note the working demo board
 
 ## Open Questions
 
-- [ ] Swimlanes (group-by) — include now or defer? Default: defer (single lane) unless trivial.
-- [ ] Accessibility of dnd (keyboard drag) — include `@dnd-kit` keyboard sensor — confirm.
+- [x] Swimlanes (group-by) — include now or defer? **Deferred** — single lane per column for now (not trivial enough to include alongside the core board).
+- [x] Accessibility of dnd (keyboard drag) — **included** the `@dnd-kit` `KeyboardSensor` so cards are draggable by keyboard (Space to pick up, arrows to move, Space to drop).
 
 ## References
 

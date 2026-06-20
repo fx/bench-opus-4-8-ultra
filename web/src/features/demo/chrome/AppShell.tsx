@@ -1,4 +1,5 @@
 import { ThemeScope } from "../../../components/ThemeScope.tsx";
+import { Board } from "../board/Board.tsx";
 import { useDemoStore } from "../store/store.ts";
 import { Sidebar } from "./Sidebar.tsx";
 import { TopNav } from "./TopNav.tsx";
@@ -6,13 +7,14 @@ import { TopNav } from "./TopNav.tsx";
 // The demo application shell (see docs/changes/0004 › Jira chrome). It composes
 // the three-zone Jira layout — fixed top nav, collapsible sidebar, and a main
 // content area — inside a `data-theme="jira"` ThemeScope so every enclosed
-// primitive resolves the Jira (light) token set. The main area renders a
-// placeholder board container; the real Kanban board arrives in change 0005, so
-// the shell is independently shippable.
+// primitive resolves the Jira (light) token set. The main area renders the
+// Kanban Board (change 0005).
 //
 // The root is w-full + overflow-x-hidden and the body row carries min-w-0 so the
 // chrome never produces document-level horizontal overflow at any breakpoint;
-// the sidebar auto-collapses and the top nav degrades responsively below lg.
+// the sidebar auto-collapses and the top nav degrades responsively below lg. The
+// board itself scrolls horizontally inside its own track (overflow-x-auto) so
+// extra columns never push the document sideways.
 
 export function AppShell() {
   const project = useDemoStore((state) => state.project);
@@ -36,16 +38,9 @@ export function AppShell() {
             </div>
           </div>
 
-          {/* Placeholder board container (the real board lands in 0005). It is a
-              labelled region so the shell renders a recognisable, testable board
-              zone without yet implementing columns or cards. */}
-          <section
-            aria-label="Board placeholder"
-            data-testid="board-placeholder"
-            className="flex min-h-64 items-center justify-center rounded border border-dashed bg-background text-sm text-muted-foreground"
-          >
-            The board lands here.
-          </section>
+          {/* The Kanban board (change 0005): four columns of draggable issue
+              cards with live counts, fed from the store. */}
+          <Board />
         </main>
       </div>
     </ThemeScope>
