@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { STATUS_META } from "./status-meta.ts";
+import { AGENT_BADGE_COLOR, STATUS_META } from "./status-meta.ts";
 import type { Status } from "../data/types.ts";
 
 // WCAG AA contrast guard for every hardcoded text-on-color introduced by the
@@ -58,9 +58,10 @@ function textBearingColors(): TextOnColor[] {
       color: STATUS_META[status].color,
     });
   }
-  // The ActivityFeed "Rovo" agent badge: white text on this violet (kept in sync
-  // with the literal in ActivityFeed.tsx).
-  rows.push({ source: "activity agent badge", color: "#6554C0" });
+  // The ActivityFeed "Rovo" agent badge: white text on AGENT_BADGE_COLOR. The
+  // SAME exported constant the component renders, so the guarded value and the
+  // rendered value can't drift.
+  rows.push({ source: "activity agent badge", color: AGENT_BADGE_COLOR });
   return rows;
 }
 

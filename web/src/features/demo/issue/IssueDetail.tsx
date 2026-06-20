@@ -2,7 +2,6 @@ import { useState } from "react";
 import type { ReactNode } from "react";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogTitle,
@@ -178,6 +177,11 @@ export function IssueDetail({
             }
           }}
         >
+          {/* DialogContent renders its own accessible, visibly-focusable close
+              button (top-right X with an sr-only "Close" label), which fires
+              onOpenChange(false) → closeIssue. We rely on that single control —
+              an extra sr-only DialogClose would add an invisible tab stop with no
+              visible focus indicator, so it is intentionally NOT rendered. */}
           <IssueDetailContent
             issue={issue}
             now={now}
@@ -187,10 +191,6 @@ export function IssueDetail({
             descriptionAiSlot={descriptionAiSlot}
             replyAiSlot={replyAiSlot}
           />
-          {/* DialogContent renders its own close button (top-right), which
-              fires onOpenChange(false) → closeIssue. We expose an explicit
-              hidden close target too so tests/assistive tech can address it. */}
-          <DialogClose className="sr-only">Close issue detail</DialogClose>
         </DialogContent>
       )}
     </Dialog>

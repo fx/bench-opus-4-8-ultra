@@ -128,6 +128,36 @@ describe("IssueDetail — comments", () => {
     renderDetail();
     expect(screen.getByTestId("activity-empty")).toBeInTheDocument();
   });
+
+  it("renders every comment when several are added under the same (fixed) clock", async () => {
+    // Regression guard for duplicate comment ids: with renderDetail injecting one
+    // fixed clock, three submissions must each get a distinct id and all render
+    // (ActivityFeed keys its list on comment.id — a collision would drop rows).
+    const user = userEvent.setup();
+    act(() => {
+      // SLOP-102 starts empty, so the feed holds exactly what we add.
+      useDemoStore.getState().openIssue("SLOP-102");
+    });
+    renderDetail();
+
+    for (const body of ["alpha", "beta", "gamma"]) {
+      await user.type(screen.getByTestId("comment-input"), body);
+      await user.click(screen.getByTestId("comment-submit"));
+    }
+
+    const feed = screen.getByTestId("activity-feed");
+    const items = within(feed).getAllByRole("listitem");
+    expect(items).toHaveLength(3);
+    // Newest-first ordering preserved across same-clock adds.
+    expect(items[0]).toHaveTextContent("gamma");
+    expect(items[2]).toHaveTextContent("alpha");
+    // All three persisted ids are distinct.
+    const ids = selectIssueByKey(
+      useDemoStore.getState(),
+      "SLOP-102",
+    )!.comments.map((c) => c.id);
+    expect(new Set(ids).size).toBe(3);
+  });
 });
 
 describe("IssueDetail — inline description edit", () => {
@@ -198,6 +228,27 @@ describe("IssueDetail — close", () => {
 
     expect(useDemoStore.getState().selectedIssueKey).toBeNull();
     expect(screen.queryByTestId("issue-detail")).not.toBeInTheDocument();
+  });
+
+  it("exposes exactly ONE accessible, focusable close button (the built-in X) and it closes the modal", async () => {
+    const user = userEvent.setup();
+    act(() => {
+      useDemoStore.getState().openIssue("SLOP-101");
+    });
+    renderDetail();
+
+    // Only the DialogContent's built-in close exists — no redundant sr-only
+    // DialogClose adding a second (invisible) tab stop.
+    const closeButtons = screen.getAllByRole("button", { name: "Close" });
+    expect(closeButtons).toHaveLength(1);
+
+    // It is focusable (no negative tabindex) and clicking it closes the modal.
+    const close = closeButtons[0];
+    expect(close).not.toHaveAttribute("tabindex", "-1");
+    close.focus();
+    expect(close).toHaveFocus();
+    await user.click(close);
+    expect(useDemoStore.getState().selectedIssueKey).toBeNull();
   });
 });
 

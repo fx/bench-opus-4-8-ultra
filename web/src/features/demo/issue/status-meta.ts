@@ -37,3 +37,9 @@ export const STATUS_META: Record<Status, StatusMeta> = {
 // lists. Re-exported from STATUS_ORDER so the dropdown and the board share one
 // ordering source.
 export const STATUS_OPTIONS: readonly Status[] = STATUS_ORDER;
+
+// The violet fill of the activity feed's "Rovo" agent badge (ActivityFeed). White
+// text sits on it, so it is AA-guarded (5.86:1) by status-meta.contrast.test.ts —
+// kept here as the SINGLE source of truth so the rendered colour and the guarded
+// colour can never drift. (Matches the agent's avatar/ring violet elsewhere.)
+export const AGENT_BADGE_COLOR = "#6554C0";

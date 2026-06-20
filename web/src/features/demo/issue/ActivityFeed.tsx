@@ -1,8 +1,8 @@
 import { Sparkles } from "lucide-react";
-import { cn } from "../../../lib/cn.ts";
 import type { Comment } from "../data/types.ts";
 import { AssigneeAvatar } from "../board/CardMeta.tsx";
 import { formatRelativeTime } from "./relative-time.ts";
+import { AGENT_BADGE_COLOR } from "./status-meta.ts";
 
 // The issue-detail activity feed (see docs/changes/0006 › Comments / activity).
 // It lists an issue's comments newest-first (reverse-chronological) — each row a
@@ -45,12 +45,13 @@ export function ActivityFeed({ comments, now }: ActivityFeedProps) {
               {comment.byAgent && (
                 <span
                   data-testid="activity-agent-badge"
-                  className={cn(
-                    "inline-flex items-center gap-0.5 rounded-sm px-1 text-[10px] font-semibold",
-                    // White text on the AA-safe violet (#6554C0, 5.86:1) so the
-                    // agent marker reads as AI without a contrast miss.
-                    "bg-[#6554C0] text-white",
-                  )}
+                  // White text on the AA-safe violet (AGENT_BADGE_COLOR =
+                  // #6554C0, 5.86:1) so the agent marker reads as AI without a
+                  // contrast miss. The colour comes from the shared constant
+                  // (single source of truth with the contrast guard) via an inline
+                  // style, since the value isn't a static Tailwind class.
+                  className="inline-flex items-center gap-0.5 rounded-sm px-1 text-[10px] font-semibold text-white"
+                  style={{ backgroundColor: AGENT_BADGE_COLOR }}
                 >
                   <Sparkles className="h-3 w-3" aria-hidden="true" />
                   Rovo

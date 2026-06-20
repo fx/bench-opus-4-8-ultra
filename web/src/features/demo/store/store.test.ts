@@ -362,8 +362,38 @@ describe("applyAddComment (pure comment reducer, 0006)", () => {
     expect(added?.body).toBe("Looks great");
     expect(added?.author).toBe(author);
     expect(added?.createdAt).toBe(100);
-    expect(added?.id).toBe(`c-${target.key}-100`);
+    // Deterministic, per-issue-unique id: prefix + monotonic seq + clock.
+    expect(added?.id).toBe(`uc-${target.key}-1-100`);
     expect(updated?.updatedAt).toBe(100);
+  });
+
+  it("gives every comment a DISTINCT id even under the SAME fixed clock", () => {
+    // Regression guard: ids must not collide when two comments share a timestamp
+    // (ActivityFeed keys its list on comment.id). Add three comments to the same
+    // issue with one fixed clock and assert all ids are unique.
+    let state = useDemoStore.getState();
+    const target = state.issues[0];
+    for (const body of ["first", "second", "third"]) {
+      const result = applyAddComment(
+        state,
+        target.key,
+        body,
+        target.reporter,
+        () => 100,
+      );
+      // Fold the partial slice back into a working state for the next iteration.
+      state = {
+        ...state,
+        issues: (result as { issues: typeof state.issues }).issues,
+      };
+    }
+    const updated = state.issues.find((i) => i.key === target.key)!;
+    const userComments = updated.comments.filter((c) =>
+      c.id.startsWith(`uc-${target.key}-`),
+    );
+    expect(userComments).toHaveLength(3);
+    const ids = userComments.map((c) => c.id);
+    expect(new Set(ids).size).toBe(3);
   });
 
   it("is a no-op (same reference) for a blank / whitespace-only body", () => {

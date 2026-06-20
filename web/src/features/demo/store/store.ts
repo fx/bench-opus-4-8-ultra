@@ -125,8 +125,12 @@ export function applySetDescription(
 // `issues` slice to merge or the SAME `state` reference for a no-op (unknown key
 // or empty body) so Zustand bails without notifying subscribers. The comment is
 // PREPENDED — the activity feed renders newest-first, so a fresh comment lands at
-// the top — and authored by `author` with a clock-derived id + createdAt so the
-// result is fully deterministic under an injected clock.
+// the top — and authored by `author` with a deterministic id + clock-derived
+// createdAt so the result is fully deterministic under an injected clock. The id
+// folds in a per-issue monotonic sequence (derived below) ALONGSIDE the clock, so
+// two comments added in the same millisecond — or any test using one fixed clock
+// for multiple submissions — still get DISTINCT ids (the activity feed uses
+// `comment.id` as its React list key, so a collision would break rendering).
 export function applyAddComment(
   state: DemoState,
   key: string,
@@ -145,15 +149,23 @@ export function applyAddComment(
   if (index === -1) {
     return state;
   }
+  const issues = state.issues.slice();
+  const issue = issues[index];
   const at = now();
+  // A per-issue monotonic sequence: count how many user-added comments this
+  // issue already has (ids prefixed `uc-${key}-`) and use the next ordinal. This
+  // never repeats for a given issue even under a fixed clock, and is independent
+  // of the timestamp, so same-millisecond adds stay unique. Seed comment ids use
+  // a different prefix, so they never clash with this counter.
+  const prefix = `uc-${key}-`;
+  const nextSeq =
+    issue.comments.filter((c) => c.id.startsWith(prefix)).length + 1;
   const comment: Comment = {
-    id: `c-${key}-${at}`,
+    id: `${prefix}${nextSeq}-${at}`,
     author,
     body: trimmed,
     createdAt: at,
   };
-  const issues = state.issues.slice();
-  const issue = issues[index];
   issues[index] = {
     ...issue,
     comments: [comment, ...issue.comments],
